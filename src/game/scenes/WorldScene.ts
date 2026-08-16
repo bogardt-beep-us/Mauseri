@@ -2104,19 +2104,39 @@ export class WorldScene extends Phaser.Scene implements ScriptHost {
    * Stellt den Zustand fuer automatisierte Tests bereit. Bewusst auch im
    * fertigen Spiel vorhanden: es sind nur Lesewerte, und ohne sie liesse sich
    * nicht pruefen, ob die Figur sich tatsaechlich bewegt.
+   *
+   * Die schreibenden Testhilfen (Springen zu einer Karte, Faehigkeiten
+   * freischalten) haengen an "?test=1". Ohne diesen Parameter gibt es sie
+   * nicht - sonst waere das Spiel mit zwei Zeilen Konsole durchgespielt.
    */
   private publishDebugState(): void {
     const tile = worldToTile(this.player.x, this.player.y);
-    (window as unknown as { __mauseriDebug: unknown }).__mauseriDebug = {
+    const debug: Record<string, unknown> = {
       area: this.area?.id,
       playerTile: { x: tile.tx, y: tile.ty },
       hp: gameState.state.hp,
+      maxHp: gameState.state.maxHp,
       enemies: this.enemies.length,
       npcs: this.npcs.length,
       objects: this.objects.length,
       boss: this.boss?.def.id ?? null,
       dialogueActive: this.dialogue.isActive,
       scriptRunning: this.scripts.isRunning,
+      abilities: [...gameState.state.abilities],
     };
+
+    if (this.testModeEnabled) {
+      debug.warp = (area: AreaId, x: number, y: number) => void this.warpTo(area, x, y);
+      debug.grantAbility = (id: AbilityId) => gameState.grantAbility(id);
+      debug.setFlag = (name: string, value = true) => gameState.setFlag(name, value);
+      debug.attack = () => this.performAttack();
+      debug.hurt = (amount: number) => this.damagePlayer(amount, this.player.x + 20, this.player.y);
+    }
+
+    (window as unknown as { __mauseriDebug: unknown }).__mauseriDebug = debug;
   }
+
+  /** Nur aktiv, wenn die Seite mit "?test=1" geoeffnet wurde. */
+  private readonly testModeEnabled =
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('test') === '1';
 }

@@ -13,7 +13,10 @@
     "icons": "node scripts/generate-icons.mjs",
     "test:smoke": "node scripts/smoke-test.mjs",
     "check:content": "node --experimental-strip-types --import ./scripts/register-ts.mjs scripts/check-content.mjs",
-    "check": "npm run check:maps && npm run check:content && tsc --noEmit"
+    "check": "npm run check:maps && npm run check:content && tsc --noEmit",
+    "test:areas": "node --experimental-strip-types --import ./scripts/register-ts.mjs scripts/area-test.mjs",
+    "test:combat": "node scripts/combat-test.mjs",
+    "test": "npm run test:smoke && npm run test:areas && npm run test:combat"
   },
   "dependencies": {
     "phaser": "^3.90.0",

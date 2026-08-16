@@ -36,12 +36,27 @@ export function TouchControls({ hud, selectedAbility, onSelectAbility, onUseAbil
   const [stick, setStick] = useState<{ baseX: number; baseY: number; dx: number; dy: number } | null>(null);
   const pointerId = useRef<number | null>(null);
 
-  // Erst anzeigen, wenn das Geraet tatsaechlich beruehrt wird.
+  // Erst anzeigen, wenn das Geraet tatsaechlich beruehrt wird - am Rechner
+  // waere die Steuerung nur im Weg.
+  //
+  // Es wird auf zwei Ereignisse gehoert: "touchstart" und "pointerdown" mit
+  // pointerType "touch". Manche Browser (und einige Android-Geraete im
+  // Desktop-Modus) liefern nur das eine oder nur das andere; auf einem davon
+  // waere die Steuerung sonst dauerhaft unsichtbar und das Spiel unbedienbar.
   useEffect(() => {
     if (touchUsed) return;
-    const onTouch = () => setTouchUsed(true);
-    window.addEventListener('touchstart', onTouch, { once: true, passive: true });
-    return () => window.removeEventListener('touchstart', onTouch);
+
+    const zeigen = () => setTouchUsed(true);
+    const beiPointer = (event: PointerEvent) => {
+      if (event.pointerType === 'touch' || event.pointerType === 'pen') zeigen();
+    };
+
+    window.addEventListener('touchstart', zeigen, { passive: true });
+    window.addEventListener('pointerdown', beiPointer, { passive: true });
+    return () => {
+      window.removeEventListener('touchstart', zeigen);
+      window.removeEventListener('pointerdown', beiPointer);
+    };
   }, [touchUsed]);
 
   const sendVector = useCallback((x: number, y: number) => {

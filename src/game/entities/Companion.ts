@@ -143,12 +143,26 @@ export class Companion extends Actor {
   /** Vergisst gesagte Kommentare - z. B. beim Betreten einer neuen Region. */
   forgetComments(): void {
     this.saidRecently.clear();
+    this.commentCooldownMs = 0;
+    // Eine offene Sprechblase gehoert zur alten Karte und darf nicht
+    // mitwandern - sonst kommentiert Pookie in Miauport ein Raetsel aus
+    // Kratzfels.
+    this.clearBubble();
+  }
+
+  /** Entfernt eine sichtbare Sprechblase sofort - samt ihrem Folge-Timer. */
+  clearBubble(): void {
+    this.bubbleFollow?.remove();
+    this.bubbleFollow = null;
+    this.bubble?.destroy();
+    this.bubble = null;
   }
 
   private bubble: Phaser.GameObjects.Container | null = null;
+  private bubbleFollow: Phaser.Time.TimerEvent | null = null;
 
   private showBubble(text: string): void {
-    this.bubble?.destroy();
+    this.clearBubble();
 
     const padding = 6;
     const label = this.scene.add.text(0, 0, text, {
@@ -184,16 +198,28 @@ export class Companion extends Actor {
       ease: 'Back.easeOut',
     });
 
-    // Sprechblase folgt Pookie, solange sie sichtbar ist.
+    // Sprechblase folgt Pookie und bleibt dabei im Bild: steht er am
+    // Kartenrand, wuerde die Blase sonst halb abgeschnitten.
     const followEvent = this.scene.time.addEvent({
       delay: 16,
       loop: true,
-      callback: () => container.setPosition(this.x, this.y - 30),
+      callback: () => {
+        const view = this.scene.cameras.main.worldView;
+        const halbeBreite = width / 2 + 4;
+        const x = Phaser.Math.Clamp(this.x, view.x + halbeBreite, view.right - halbeBreite);
+        const y = Math.max(this.y - 30, view.y + height / 2 + 4);
+        container.setPosition(x, y);
+      },
     });
+    this.bubbleFollow = followEvent;
 
     this.scene.time.delayedCall(2600 + text.length * 22, () => {
+      // Die Blase kann inzwischen durch einen Kartenwechsel entfernt worden
+      // sein - dann gehoert dieser Timer zu einer anderen Blase.
+      if (this.bubble !== container) return;
       followEvent.remove();
-      if (!container.active) return;
+      this.bubbleFollow = null;
+      this.bubble = null;
       this.scene.tweens.add({
         targets: container,
         alpha: 0,
@@ -201,7 +227,6 @@ export class Companion extends Actor {
         duration: 220,
         onComplete: () => container.destroy(),
       });
-      if (this.bubble === container) this.bubble = null;
     });
   }
 
@@ -223,7 +248,7 @@ export class Companion extends Actor {
   private idleTimer = 2000;
 
   override destroy(): void {
-    this.bubble?.destroy();
+    this.clearBubble();
     super.destroy();
   }
 }
