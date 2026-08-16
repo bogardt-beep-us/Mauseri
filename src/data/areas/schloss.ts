@@ -253,6 +253,18 @@ export const SCHLOSS_AREAS: AreaDef[] = [
       { type: 'mirror', id: 's3', x: 8, y: 13, puzzle: 'schloss_spiegelkammer', angle: 0 },
       { type: 'mirror', id: 's4', x: 21, y: 13, puzzle: 'schloss_spiegelkammer', angle: 0 },
 
+      // In der Spiegelkammer zeigt sich, wie Nyxara einmal war.
+      {
+        type: 'trigger',
+        id: 'erinnerung_nyxara',
+        x: 12,
+        y: 8,
+        w: 6,
+        h: 4,
+        script: 'erinnerung_nyxara',
+        once: true,
+      },
+
       { type: 'enemy', enemy: 'spiegelscherbe', x: 4, y: 9, leash: 7 },
       { type: 'enemy', enemy: 'spiegelscherbe', x: 25, y: 9, leash: 7 },
       { type: 'enemy', enemy: 'schattenwache', x: 15, y: 3, leash: 6, permanent: true, id: 'spiegel_wache' },

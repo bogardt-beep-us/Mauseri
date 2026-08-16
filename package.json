@@ -6,12 +6,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run check:maps && tsc --noEmit && vite build",
+    "build": "npm run check && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "check:maps": "node --experimental-strip-types scripts/check-maps.mjs",
+    "check:maps": "node --experimental-strip-types --import ./scripts/register-ts.mjs scripts/check-maps.mjs",
     "icons": "node scripts/generate-icons.mjs",
-    "test:smoke": "node scripts/smoke-test.mjs"
+    "test:smoke": "node scripts/smoke-test.mjs",
+    "check:content": "node --experimental-strip-types --import ./scripts/register-ts.mjs scripts/check-content.mjs",
+    "check": "npm run check:maps && npm run check:content && tsc --noEmit"
   },
   "dependencies": {
     "phaser": "^3.90.0",

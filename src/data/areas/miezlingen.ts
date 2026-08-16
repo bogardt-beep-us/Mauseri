@@ -357,6 +357,9 @@ export const MIEZLINGEN_AREAS: AreaDef[] = [
     ],
     objects: [
       { type: 'npc', npc: 'verschwundener_murr', x: 6, y: 2, facing: 'down' },
+      // Murr wird beim Betreten gefunden, nicht erst beim Ansprechen - der
+      // Moment soll den Spieler treffen, nicht auf ihn warten.
+      { type: 'trigger', id: 'scheune_murr', x: 5, y: 5, w: 4, h: 3, script: 'scheune_murr', once: true },
       {
         type: 'chest',
         id: 'scheune_chest_1',
