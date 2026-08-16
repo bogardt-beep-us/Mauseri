@@ -1,0 +1,55 @@
+name: Bauen und auf GitHub Pages veroeffentlichen
+
+on:
+  push:
+    branches: [main]
+  # Erlaubt das Veroeffentlichen von Hand ueber den Actions-Reiter.
+  workflow_dispatch:
+
+# Nur ein Deployment gleichzeitig; laufende Veroeffentlichungen werden nicht
+# abgebrochen, damit keine halb hochgeladene Seite live geht.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  bauen:
+    name: Pruefen und bauen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Abhaengigkeiten installieren
+        run: npm ci
+
+      - name: Karten, Inhalte und Typen pruefen
+        run: npm run check
+
+      - name: Bauen
+        run: npx vite build
+
+      - name: Ausgabe hochladen
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  veroeffentlichen:
+    name: Veroeffentlichen
+    needs: bauen
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
+  // Relative Basis statt "/": damit laeuft das Spiel sowohl unter einer eigenen
+  // Domain als auch unter einem Unterpfad wie /Mauseri/ auf GitHub Pages,
+  // ohne dass fuer jedes Ziel neu gebaut werden muss.
+  base: './',
   plugins: [react()],
   resolve: {
     alias: {

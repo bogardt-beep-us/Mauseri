@@ -19,7 +19,10 @@ document.getElementById('boot-splash')?.remove();
 // das Spiel laeuft dann eben nur online.
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((err) => {
+    // BASE_URL statt "/sw.js": unter einem Unterpfad (GitHub Pages) laege der
+    // Worker sonst ausserhalb seines Scopes und wuerde abgelehnt.
+    const swPfad = new URL('sw.js', new URL(import.meta.env.BASE_URL, window.location.href));
+    navigator.serviceWorker.register(swPfad).catch((err) => {
       console.warn('[PWA] Service Worker konnte nicht registriert werden:', err);
     });
   });
