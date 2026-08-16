@@ -16,7 +16,8 @@
     "check": "npm run check:maps && npm run check:content && tsc --noEmit",
     "test:areas": "node --experimental-strip-types --import ./scripts/register-ts.mjs scripts/area-test.mjs",
     "test:combat": "node scripts/combat-test.mjs",
-    "test": "npm run test:smoke && npm run test:areas && npm run test:combat"
+    "test": "npm run test:smoke && npm run test:areas && npm run test:combat && npm run test:progress",
+    "test:progress": "node scripts/progress-test.mjs"
   },
   "dependencies": {
     "phaser": "^3.90.0",

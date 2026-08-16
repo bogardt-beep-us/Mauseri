@@ -2123,10 +2123,23 @@ export class WorldScene extends Phaser.Scene implements ScriptHost {
       dialogueActive: this.dialogue.isActive,
       scriptRunning: this.scripts.isRunning,
       abilities: [...gameState.state.abilities],
+      puzzles: [...gameState.state.puzzles],
+      bossesDefeated: [...gameState.state.bosses],
+      bossHp: this.boss?.hp ?? null,
+      quests: Object.fromEntries(
+        Object.entries(gameState.state.quests).map(([id, q]) => [id, q.state]),
+      ),
     };
 
     if (this.testModeEnabled) {
       debug.warp = (area: AreaId, x: number, y: number) => void this.warpTo(area, x, y);
+      // Versetzt die Figur innerhalb der Karte, ohne sie neu zu laden - beim
+      // Warpen gingen sonst halb geloeste Raetsel verloren.
+      debug.placeAt = (tx: number, ty: number) => {
+        const p = tileToWorld(tx, ty);
+        this.player.placeAt(p.x, p.y);
+        this.pookie.warpTo(p.x, p.y);
+      };
       debug.grantAbility = (id: AbilityId) => gameState.grantAbility(id);
       debug.setFlag = (name: string, value = true) => gameState.setFlag(name, value);
       debug.attack = () => this.performAttack();
