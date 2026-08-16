@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Mauseri">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="72%">
+      <stop offset="0%" stop-color="#3a2c60" />
+      <stop offset="100%" stop-color="#171126" />
+    </radialGradient>
+    <linearGradient id="fur" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffd98a" />
+      <stop offset="100%" stop-color="#e8a44f" />
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="96" fill="url(#bg)" />
+
+  <!-- Mond hinter der Katze: das Herz der Nacht -->
+  <circle cx="256" cy="196" r="132" fill="#6f5ba8" opacity="0.28" />
+
+  <!-- Ohren -->
+  <path d="M138 214 L150 96 L242 168 Z" fill="url(#fur)" />
+  <path d="M374 214 L362 96 L270 168 Z" fill="url(#fur)" />
+  <path d="M160 200 L168 132 L218 176 Z" fill="#c4657f" />
+  <path d="M352 200 L344 132 L294 176 Z" fill="#c4657f" />
+
+  <!-- Kopf -->
+  <ellipse cx="256" cy="252" rx="128" ry="116" fill="url(#fur)" />
+
+  <!-- Augen -->
+  <ellipse cx="206" cy="242" rx="26" ry="32" fill="#241a3d" />
+  <ellipse cx="306" cy="242" rx="26" ry="32" fill="#241a3d" />
+  <ellipse cx="214" cy="232" rx="9" ry="11" fill="#ffffff" />
+  <ellipse cx="314" cy="232" rx="9" ry="11" fill="#ffffff" />
+
+  <!-- Nase und Mund -->
+  <path d="M256 282 L272 296 L256 308 L240 296 Z" fill="#c4657f" />
+  <path d="M256 308 q-22 22 -44 4" stroke="#8c5a2b" stroke-width="8" fill="none" stroke-linecap="round" />
+  <path d="M256 308 q22 22 44 4" stroke="#8c5a2b" stroke-width="8" fill="none" stroke-linecap="round" />
+
+  <!-- Schnurrhaare -->
+  <g stroke="#fff4dc" stroke-width="7" stroke-linecap="round" opacity="0.85">
+    <path d="M132 268 L196 278" />
+    <path d="M136 306 L198 300" />
+    <path d="M380 268 L316 278" />
+    <path d="M376 306 L314 300" />
+  </g>
+</svg>
