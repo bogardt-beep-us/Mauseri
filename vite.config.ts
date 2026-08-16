@@ -13,10 +13,13 @@ export default defineConfig({
     target: 'es2022',
     // Phaser is large; splitting it keeps the app chunk small enough to parse
     // quickly on mid-range phones while the engine loads in parallel.
+    // Rolldown (ab Vite 8) erwartet manualChunks als Funktion - die
+    // Objektschreibweise aus aelteren Vite-Versionen wird nicht mehr akzeptiert.
     rollupOptions: {
       output: {
-        manualChunks: {
-          phaser: ['phaser'],
+        manualChunks(id: string) {
+          if (id.includes('node_modules/phaser')) return 'phaser';
+          return undefined;
         },
       },
     },

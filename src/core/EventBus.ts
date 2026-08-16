@@ -57,7 +57,7 @@ export type GameEvents = {
   'scene:transition': { areaId: string; areaName: string; regionName: string };
   'cutscene:start': void;
   'cutscene:end': void;
-  'ui:openMenu': 'inventory' | 'quests' | 'map' | 'settings' | null;
+  'ui:openMenu': 'inventar' | 'quests' | 'karte' | 'einstellungen' | null;
   'input:virtual': { x: number; y: number };
   'input:action': 'attack' | 'interact' | 'dodge' | 'special' | 'block-start' | 'block-end';
   'credits:show': { ending: 'true' | 'good' };

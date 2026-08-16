@@ -373,6 +373,40 @@ const telegraph: ObjectDrawer = (ctx) => {
   ellipse(ctx, 16, 16, 12, 12, 0xff5f5f, 0.18);
 };
 
+/**
+ * Hintergrundfeld hinter der Welt.
+ *
+ * Auf einem hochkant gehaltenen Handy ist das Sichtfeld deutlich hoeher als
+ * jeder Innenraum breit ist. Ohne Hintergrund staende die Karte in einer
+ * leeren Flaeche. Dieses kachelbare Muster fuellt den Rand so, dass er wie
+ * gestaltete Nacht wirkt statt wie ein Darstellungsfehler.
+ */
+const backdrop: ObjectDrawer = (ctx, rng) => {
+  const size = 64;
+  rect(ctx, 0, 0, size, size, 0x171126);
+
+  // Diagonale Schraffur, sehr schwach
+  for (let i = -size; i < size * 2; i += 8) {
+    line(ctx, i, 0, i + size, size, 0x241a3d, 1, 0.5);
+  }
+
+  // Vereinzelte Pfotenabdruecke
+  for (let p = 0; p < 2; p++) {
+    const px0 = rng() * size;
+    const py0 = rng() * size;
+    ellipse(ctx, px0, py0, 3, 2.4, 0x2a1f47, 0.75);
+    for (let i = 0; i < 4; i++) {
+      const a = -Math.PI * 0.85 + (i / 3) * Math.PI * 0.7;
+      ellipse(ctx, px0 + Math.cos(a) * 4.4, py0 + Math.sin(a) * 4.4, 1.2, 1.2, 0x2a1f47, 0.75);
+    }
+  }
+
+  // Sterne
+  for (let i = 0; i < 5; i++) {
+    px(ctx, rng() * size, rng() * size, 0x6a5b9a, 0.6);
+  }
+};
+
 /** Nebelschwade fuer Schnurrwald und Schattenlande. */
 const fog: ObjectDrawer = (ctx, rng) => {
   for (let i = 0; i < 6; i++) {
@@ -691,6 +725,8 @@ export function generateObjectTextures(textures: Phaser.Textures.TextureManager)
   addTexture(textures, 'hint:interact', interactHint);
   addTexture(textures, 'hint:quest', questHint);
   addTexture(textures, 'hint:questDone', questDoneHint);
+
+  addTexture(textures, 'bg:nacht', backdrop, 64);
 
   addTexture(textures, 'fx:slash', slash);
   addTexture(textures, 'fx:impact', impact);

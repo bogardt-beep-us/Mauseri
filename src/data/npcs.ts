@@ -52,6 +52,7 @@ export const NPCS: Record<string, NpcDef> = {
     },
     dialogue: [
       { showIf: { bossDefeated: 'nyxara' }, node: 'hetta_ende' },
+      { showIf: { hasItem: 'brotlaib' }, node: 'hetta_brot' },
       { showIf: { hasAbility: 'mondkralle' }, node: 'hetta_stolz' },
       { showIf: { questState: 'q_glocke', state: 'completed' }, node: 'hetta_glocke_fertig' },
       { showIf: { questState: 'q_glocke', state: 'active' }, node: 'hetta_glocke_aktiv' },
