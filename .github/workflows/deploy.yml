@@ -49,7 +49,34 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deploy1.outputs.page_url || steps.deploy2.outputs.page_url || steps.deploy3.outputs.page_url }}
     steps:
-      - id: deployment
+      # Der Pages-Dienst antwortet zeitweise mit 503 ("no server available").
+      # GitHub Actions kennt keine eingebaute Wiederholung fuer Schritte,
+      # deshalb hier drei Anlaeufe mit wachsender Pause. Der erste Erfolg
+      # beendet die Kette, weil die Folgeschritte nur bei Fehlschlag laufen.
+      - name: Veroeffentlichen (Versuch 1)
+        id: deploy1
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+
+      - name: Pause vor Versuch 2
+        if: steps.deploy1.outcome == 'failure'
+        run: sleep 60
+
+      - name: Veroeffentlichen (Versuch 2)
+        id: deploy2
+        if: steps.deploy1.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+
+      - name: Pause vor Versuch 3
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
+        run: sleep 150
+
+      # Letzter Anlauf ohne continue-on-error: schlaegt auch er fehl, soll der
+      # Lauf rot werden.
+      - name: Veroeffentlichen (Versuch 3)
+        id: deploy3
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
         uses: actions/deploy-pages@v4
