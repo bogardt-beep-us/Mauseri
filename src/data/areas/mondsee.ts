@@ -37,7 +37,7 @@ export const MONDSEE_AREAS: AreaDef[] = [
       '#############-################',
     ],
     objects: [
-      { type: 'portal', x: 0, y: 1, to: 'miauport_hafen', toX: 15, toY: 16, facing: 'left' },
+      { type: 'portal', x: 0, y: 1, to: 'miauport_hafen', toX: 14, toY: 17, facing: 'left' },
       { type: 'portal', x: 13, y: 19, to: 'mondsee_schleuse', toX: 12, toY: 1, facing: 'down' },
 
       { type: 'trigger', id: 'mondsee_ankunft', x: 2, y: 2, w: 5, h: 3, script: 'mondsee_ankunft', once: true },
@@ -214,8 +214,11 @@ export const MONDSEE_AREAS: AreaDef[] = [
         x: 27,
         y: 2,
         to: 'schattenlande_pfad',
+        // Ankunft im Norden: von dort laeuft man nach Sueden und trifft erst
+        // die Ankunftsszene, dann die Trennung. Kam man unten an, lief die
+        // Trennung vor der Ankunft.
         toX: 14,
-        toY: 18,
+        toY: 1,
         facing: 'up',
         lockedUnless: { bossDefeated: 'spiegelkatze' },
         lockedText: 'Der Weg nach Norden liegt hinter dem Spiegel.',

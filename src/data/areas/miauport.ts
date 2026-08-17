@@ -42,9 +42,11 @@ export const MIAUPORT_AREAS: AreaDef[] = [
       { type: 'portal', x: 17, y: 3, to: 'miauport_markt', toX: 8, toY: 10, facing: 'up', transition: 'door' },
       { type: 'portal', x: 6, y: 9, to: 'miauport_haus', toX: 6, toY: 7, facing: 'up', transition: 'door' },
 
+      // Am Ende des Stegs: links geht es hinunter in die Hoehle, rechts legt
+      // Kapitaenin Welle ab.
       {
         type: 'portal',
-        x: 14,
+        x: 13,
         y: 18,
         to: 'miauport_hoehle',
         toX: 14,
@@ -52,6 +54,17 @@ export const MIAUPORT_AREAS: AreaDef[] = [
         facing: 'down',
         lockedUnless: { flag: 'schluck_geruecht_gehoert' },
         lockedText: 'Unter dem Steg fuehrt ein Gang ins Dunkle. Wozu, weiss hier niemand.',
+      },
+      {
+        type: 'portal',
+        x: 15,
+        y: 18,
+        to: 'mondsee_ufer',
+        toX: 2,
+        toY: 2,
+        facing: 'down',
+        lockedUnless: { flag: 'ueberfahrt_bezahlt' },
+        lockedText: 'Welles Schiff liegt fest vertaut. Ohne sie faehrt es nirgendwohin.',
       },
 
       { type: 'trigger', id: 'miauport_ankunft', x: 2, y: 9, w: 4, h: 3, script: 'miauport_ankunft', once: true },
@@ -230,7 +243,7 @@ export const MIAUPORT_AREAS: AreaDef[] = [
       '##############################',
     ],
     objects: [
-      { type: 'portal', x: 14, y: 0, to: 'miauport_hafen', toX: 14, toY: 18, facing: 'up' },
+      { type: 'portal', x: 14, y: 0, to: 'miauport_hafen', toX: 14, toY: 17, facing: 'up' },
 
       // Drei Laternen - die dritte liegt hinter dem Wasser
       { type: 'torch', id: 'hoehle_laterne_1', x: 7, y: 4, puzzle: 'miauport_schmuggler' },

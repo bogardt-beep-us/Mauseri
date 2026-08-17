@@ -38,9 +38,21 @@ export const MIAUPORT_DIALOGUES: Record<string, DialogueNode> = {
   welle_angebot: {
     id: 'welle_angebot',
     lines: [
-      { speaker: 'kapitaenin_welle', text: 'Salz hat erzaehlt, was du fuer sie getan hast.' },
-      { speaker: 'kapitaenin_welle', text: 'Das heisst nichts fuer die Untiefe. Aber es heisst was fuer mich.' },
-      { speaker: 'kapitaenin_welle', text: 'Raeum sie aus. Dann leg ich ab, und zwar sofort.' },
+      { speaker: 'kapitaenin_welle', text: 'Die Untiefe ist still.', mood: 'surprised' },
+      { speaker: 'kapitaenin_welle', text: 'Ich hab es vom Kai aus gehoert. Beziehungsweise: ich hab es NICHT gehoert.' },
+      { speaker: 'kapitaenin_welle', text: 'Sechs Wochen lang hat da unten was gemahlen. Und jetzt nichts.' },
+      { speaker: 'mauseri', text: 'Es ist erledigt.' },
+      { speaker: 'kapitaenin_welle', text: 'Das seh ich.', mood: 'happy' },
+      { speaker: 'kapitaenin_welle', text: 'Ich hab gesagt, wer das raeumt, faehrt umsonst. Ich steh zu sowas.' },
+      { speaker: 'kapitaenin_welle', text: 'Das Schiff liegt am Ende vom Steg. Steig ein, wann du willst.' },
+      { speaker: 'pookie', text: 'Ein SCHIFF.', mood: 'scared' },
+      { speaker: 'kapitaenin_welle', text: 'Ein sehr gutes Schiff.' },
+      { speaker: 'pookie', text: 'Schiffe stehen auf WASSER.' },
+      { speaker: 'kapitaenin_welle', text: 'Das ist ueblich, ja.' },
+    ],
+    effects: [
+      { setFlag: 'ueberfahrt_bezahlt' },
+      { toast: 'Welles Schiff liegt zur Abfahrt bereit - am Ende des Stegs.', kind: 'quest' },
     ],
   },
 

@@ -349,6 +349,8 @@ export type Condition =
   | { hasAbility: AbilityId }
   | { puzzleSolved: string }
   | { bossDefeated: string }
+  /** Ein bestimmter, dauerhaft besiegter Gegner (dessen Objekt-ID). */
+  | { slain: string }
   | { secretsFound: number }
   | { all: Condition[] }
   | { any: Condition[] }

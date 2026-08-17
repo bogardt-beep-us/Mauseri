@@ -110,12 +110,11 @@ try {
   // =========================================================================
 
   if (geloest) {
-    // Die Karte neu betreten, damit das an das Raetsel gebundene
-    // Boss-Objekt gesetzt wird.
-    await page.evaluate(() => window.__mauseriDebug?.warp?.('schnurrwald_pfad', 14, 1));
-    await page.waitForTimeout(1200);
-    await page.evaluate(() => window.__mauseriDebug?.warp?.('schnurrwald_lichtung', 15, 10));
-    await page.waitForTimeout(2000);
+    // Bewusst OHNE die Karte zu verlassen: der an das Raetsel gebundene
+    // Boss-Trigger muss noch waehrend des Aufenthalts erscheinen. Frueher
+    // passierte nach dem Loesen sichtbar nichts, bis man neu betrat.
+    await page.evaluate(() => window.__mauseriDebug?.placeAt?.(15, 10));
+    await page.waitForTimeout(2500);
     await dialogWeg();
     await page.waitForTimeout(1200);
 

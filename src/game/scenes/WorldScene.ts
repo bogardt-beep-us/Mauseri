@@ -283,6 +283,15 @@ export class WorldScene extends Phaser.Scene implements ScriptHost {
     this.pookie.warpTo(position.x, position.y);
     this.pookie.forgetComments();
 
+    // Ob Pookie dabei ist, steht im Spielstand - sonst waere er nach dem
+    // Laden eines Spielstands aus den Schattenlanden wieder da, obwohl ihn
+    // der Nebel geholt hat.
+    this.pookie.setPresent(
+      !gameState.flag('pookie_getrennt') || gameState.flag('pookie_zurueck'),
+    );
+    // Ein Portal auf dem Ankunftsfeld darf nicht sofort wieder ausloesen.
+    this.ankunftsFeld = { tx, ty };
+
     gameState.setPosition(areaId, tx, ty, facing);
     gameState.visitArea(areaId);
     gameState.discoverRegion(area.region);
@@ -353,8 +362,15 @@ export class WorldScene extends Phaser.Scene implements ScriptHost {
   // =========================================================================
 
   private spawnObjects(area: AreaDef): void {
+    this.wartendeObjekte = [];
     for (const def of area.objects) {
-      if (!gameState.check(def.showIf)) continue;
+      if (!gameState.check(def.showIf)) {
+        // Noch nicht sichtbar - aber die Bedingung kann waehrend des
+        // Aufenthalts wahr werden (Raetsel geloest, Boss besiegt). Deshalb
+        // vormerken statt vergessen.
+        this.wartendeObjekte.push(def);
+        continue;
+      }
       this.spawnObject(area, def);
     }
 
@@ -627,6 +643,58 @@ export class WorldScene extends Phaser.Scene implements ScriptHost {
   private pendingBoss: { def: ObjBoss; x: number; y: number } | null = null;
   private revealedSecrets = new Set<string>();
 
+  /** Objekte dieser Karte, deren Bedingung beim Laden noch nicht erfuellt war. */
+  private wartendeObjekte: MapObject[] = [];
+
+  /**
+   * Prueft, ob wartende Objekte inzwischen erscheinen duerfen.
+   *
+   * Ohne das erschiene die Belohnungstruhe nach einem geloesten Raetsel erst
+   * beim naechsten Betreten der Karte - und ein Boss, der an ein Raetsel auf
+   * derselben Karte gebunden ist, ueberhaupt nicht. Fuer den Spieler sah das
+   * so aus, als sei nichts passiert.
+   */
+  private refreshConditionalObjects(): void {
+    if (this.wartendeObjekte.length === 0 || !this.area) return;
+
+    const nochWartend: MapObject[] = [];
+    for (const def of this.wartendeObjekte) {
+      if (gameState.check(def.showIf)) {
+        this.spawnObject(this.area, def);
+      } else {
+        nochWartend.push(def);
+      }
+    }
+
+    if (nochWartend.length !== this.wartendeObjekte.length) {
+      this.wartendeObjekte = nochWartend;
+      // Neu erschienene feste Objekte brauchen wieder eine Kollisionspruefung.
+      this.physics.add.collider(this.player.sprite, this.solidGroup);
+      this.physics.add.collider(this.pookie.sprite, this.solidGroup);
+    }
+  }
+
+  /**
+   * Kurzform des Weltzustands. Aendert sie sich, koennen neue Objekte
+   * erscheinen oder Quests weiterlaufen - alles andere (Leben, Position)
+   * aendert sich jeden Frame und darf das nicht ausloesen.
+   */
+  private zustandsKennung(): string {
+    const s = gameState.state;
+    return [
+      s.puzzles.length,
+      s.bosses.length,
+      s.collected.length,
+      s.slain.length,
+      s.abilities.length,
+      s.inventory.length,
+      Object.keys(s.flags).length,
+      Object.values(s.quests).filter((q) => q.state === 'completed').length,
+    ].join(':');
+  }
+
+  private letzteKennung = '';
+
   private addSolid(sprite: Phaser.GameObjects.Sprite): void {
     this.solidGroup.add(sprite);
     const body = sprite.body as Phaser.Physics.Arcade.StaticBody | null;
@@ -664,6 +732,16 @@ export class WorldScene extends Phaser.Scene implements ScriptHost {
     this.updateProjectiles(delta);
     this.updateHazards(delta);
     this.updatePlates();
+
+    // Hat sich am Weltzustand etwas geaendert, das Folgen hat? Der Vergleich
+    // ist absichtlich billig, damit er jeden Frame laufen darf.
+    const kennung = this.zustandsKennung();
+    if (kennung !== this.letzteKennung) {
+      this.letzteKennung = kennung;
+      gameState.syncQuests();
+      this.refreshConditionalObjects();
+    }
+
     this.checkTriggers(false);
     this.checkBossArena();
     this.updateShadowWalk();
@@ -710,6 +788,8 @@ export class WorldScene extends Phaser.Scene implements ScriptHost {
     if (this.inputSystem.consume('interact')) this.tryInteract();
     if (this.inputSystem.consume('dodge')) this.player.tryDodge();
     if (this.inputSystem.consume('special')) this.useSelectedAbility();
+
+    this.checkPortals();
 
     // Position im Spielstand mitfuehren (fuer Autosave)
     if (!this.transitioning) {
@@ -1435,6 +1515,36 @@ export class WorldScene extends Phaser.Scene implements ScriptHost {
     });
   }
 
+  /**
+   * Loest ein Portal aus, sobald die Figur darauf steht.
+   *
+   * Tueren und Kartenraender nur per Taste zu oeffnen fuehlt sich zaeh an, und
+   * mehrere Portale liegen genau auf dem Feld, auf dem man ankommt. Deshalb:
+   * Betreten genuegt - aber erst, nachdem die Figur das Ankunftsfeld einmal
+   * verlassen hat, sonst wuerde sie sofort wieder zurueckgeworfen.
+   */
+  private checkPortals(): void {
+    if (this.transitioning || this.dialogue.isActive || this.scripts.isRunning) return;
+
+    const hier = worldToTile(this.player.x, this.player.y);
+
+    if (this.ankunftsFeld && (hier.tx !== this.ankunftsFeld.tx || hier.ty !== this.ankunftsFeld.ty)) {
+      this.ankunftsFeld = null;
+    }
+    if (this.ankunftsFeld) return;
+
+    for (const object of this.objects) {
+      const def = object.def;
+      if (def.type !== 'portal') continue;
+      if (def.x !== hier.tx || def.y !== hier.ty) continue;
+      void this.usePortal(def);
+      return;
+    }
+  }
+
+  /** Feld, auf dem die Figur die Karte betreten hat. */
+  private ankunftsFeld: { tx: number; ty: number } | null = null;
+
   private async usePortal(def: ObjPortal): Promise<void> {
     if (def.lockedUnless && !gameState.check(def.lockedUnless)) {
       bus.emit('toast', { text: def.lockedText ?? 'Hier geht es nicht weiter.', kind: 'warning' });
@@ -2018,9 +2128,20 @@ export class WorldScene extends Phaser.Scene implements ScriptHost {
   }
 
   spawnNpc(npcId: string, tx: number, ty: number): void {
+    const { x, y } = tileToWorld(tx, ty);
+
+    // Pookie ist kein NPC, sondern der Begleiter. Nach der Trennung in den
+    // Schattenlanden muss er wieder eingesetzt werden koennen - sonst bliebe
+    // er fuer den Rest des Spiels verschwunden.
+    if (npcId === 'pookie') {
+      this.pookie.setPresent(true);
+      this.pookie.warpTo(x, y);
+      this.spawnBurst(x, y, 'fx:particle:gold', 12);
+      return;
+    }
+
     const def = NPCS[npcId];
     if (!def) return;
-    const { x, y } = tileToWorld(tx, ty);
     const npc = new NpcActor(this, def, x, y, {});
     this.npcs.push(npc);
     this.spawnBurst(x, y, 'fx:particle:white', 6);

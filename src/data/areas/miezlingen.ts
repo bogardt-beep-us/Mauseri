@@ -97,9 +97,19 @@ export const MIEZLINGEN_AREAS: AreaDef[] = [
 
       // Bewohner
       { type: 'npc', npc: 'wache_tobb', x: 12, y: 19, facing: 'down' },
+      // Kork steht in seinem Laden, Hetta in ihrem Haus - vorher standen sie
+      // gleichzeitig hier draussen und drinnen.
       { type: 'npc', npc: 'fips', x: 8, y: 14, wander: true },
-      { type: 'npc', npc: 'haendler_kork', x: 7, y: 13, facing: 'down' },
-      { type: 'npc', npc: 'oma_hetta', x: 22, y: 13, wander: true },
+      // Murr steht wieder am Zaun, sobald er gerettet ist - genau so, wie
+      // Brummel es beschrieben hat.
+      {
+        type: 'npc',
+        npc: 'verschwundener_murr',
+        x: 22,
+        y: 13,
+        facing: 'down',
+        showIf: { flag: 'murr_gerettet' },
+      },
 
       // Dorfmitte
       { type: 'save', x: 13, y: 8 },

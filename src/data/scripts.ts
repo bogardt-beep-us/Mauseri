@@ -112,6 +112,7 @@ export const SCRIPTS: Record<string, ScriptDef> = {
     cutscene: true,
     steps: [
       { do: 'shake', ms: 900, intensity: 0.012 },
+      { do: 'effects', effects: [{ setFlag: 'kratzfels_tiefe_erreicht' }] },
       { do: 'dialogue', node: 'grubenherz_erwacht_1' },
       { do: 'boss', boss: 'grubenherz', x: 14, y: 8 },
     ],
@@ -198,6 +199,8 @@ export const SCRIPTS: Record<string, ScriptDef> = {
       { do: 'wait', ms: 500 },
       { do: 'music', track: 'victory' },
       { do: 'flash', color: 0xffd98a, ms: 500 },
+      // Pookie kehrt tatsaechlich in die Gruppe zurueck, nicht nur im Text.
+      { do: 'spawn', npc: 'pookie', x: 15, y: 9 },
       { do: 'effects', effects: [{ setFlag: 'pookie_zurueck' }] },
       { do: 'dialogue', node: 'wiedersehen_2' },
       { do: 'music', track: 'shadow' },

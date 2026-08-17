@@ -24,10 +24,11 @@ export const QUESTS: Record<QuestId, QuestDef> = {
     summary:
       'In der Nacht wurde am Dorfrand schwarzer Nebel gesehen. Und seither fehlt Murr.',
     giver: 'mutter_lina',
+    // Der erste Schritt war frueher schon beim Annehmen der Quest erfuellt -
+    // das Log begann also mit einem abgehakten Eintrag.
     steps: [
-      { text: 'Sprich mit den Bewohnern von Miezlingen.', done: { flag: 'prolog_nebel_gesehen' }, hintArea: 'miezlingen_dorf' },
-      { text: 'Ueberrede Tobb, dich aus dem Dorf zu lassen.', done: { flag: 'kapitel_2' }, hintArea: 'miezlingen_dorf' },
-      { text: 'Suche am Dorfrand nach Spuren von Murr.', done: { flag: 'murr_gefunden' }, hintArea: 'miezlingen_rand' },
+      { text: 'Sprich mit Tobb an der Dorfgrenze.', done: { flag: 'kapitel_2' }, hintArea: 'miezlingen_dorf' },
+      { text: 'Durchsuche die alte Scheune am Dorfrand.', done: { flag: 'murr_gefunden' }, hintArea: 'miezlingen_scheune' },
     ],
     rewards: [{ toast: 'Ihr wisst jetzt, wohin der Nebel fuehrt.', kind: 'quest' }],
   },
@@ -55,9 +56,9 @@ export const QUESTS: Record<QuestId, QuestDef> = {
     summary: 'In den Minen von Kratzfels ist etwas erwacht, das dort nicht hingehoert.',
     giver: 'schmiedin_ambra',
     steps: [
-      { text: 'Verschaffe dir Zutritt zur alten Mine.', done: { hasItem: 'minenschluessel' }, hintArea: 'kratzfels_mine' },
-      { text: 'Steige hinab in die Tiefe.', done: { flag: 'kratzfels_tiefe_erreicht' }, hintArea: 'kratzfels_tiefe' },
-      { text: 'Besiege, was in der Grube schlaeft.', done: { bossDefeated: 'grubenherz' } },
+      { text: 'Verschaffe dir Zutritt zur alten Mine.', done: { hasItem: 'minenschluessel' }, hintArea: 'kratzfels_stadt' },
+      { text: 'Bringe die Loren auf die Druckplatten.', done: { puzzleSolved: 'kratzfels_mine' }, hintArea: 'kratzfels_mine' },
+      { text: 'Besiege, was in der Grube schlaeft.', done: { bossDefeated: 'grubenherz' }, hintArea: 'kratzfels_tiefe' },
     ],
   },
 
@@ -68,9 +69,12 @@ export const QUESTS: Record<QuestId, QuestDef> = {
     region: 'miauport',
     summary: 'Nur ueber Miauport kommt man zum Mondsee. Und Kapitaenin Welle faehrt niemanden umsonst.',
     giver: 'kapitaenin_welle',
+    // Reihenfolge wie im Spiel: erst die Hoehle raeumen, dann bei Welle
+    // melden. Andersherum haenge der erste Schritt bis zum Schluss.
     steps: [
-      { text: 'Verdiene dir die Ueberfahrt.', done: { flag: 'ueberfahrt_bezahlt' }, hintArea: 'miauport_hafen' },
-      { text: 'Raeume die Schmugglerhoehle aus.', done: { bossDefeated: 'tiefenkralle' }, hintArea: 'miauport_hoehle_tief' },
+      { text: 'Finde heraus, was den Hafen blockiert.', done: { flag: 'schluck_geruecht_gehoert' }, hintArea: 'miauport_taverne' },
+      { text: 'Raeume die Untiefe unter dem Steg aus.', done: { bossDefeated: 'tiefenkralle' }, hintArea: 'miauport_hoehle_tief' },
+      { text: 'Melde dich bei Kapitaenin Welle.', done: { flag: 'ueberfahrt_bezahlt' }, hintArea: 'miauport_hafen' },
     ],
   },
 
@@ -238,7 +242,13 @@ export const QUESTS: Record<QuestId, QuestDef> = {
     region: 'miauport',
     summary: 'Schluck erzaehlt Geschichten. Eine davon stimmt.',
     giver: 'wirt_schluck',
-    steps: [{ text: 'Ueberpruefe Schlucks Geruecht in der Schmugglerhoehle.', done: { flag: 'schluck_bestaetigt' }, hintArea: 'miauport_hoehle' }],
+    steps: [
+      {
+        text: 'Ueberpruefe Schlucks Geruecht in der Schmugglerhoehle.',
+        done: { puzzleSolved: 'miauport_schmuggler' },
+        hintArea: 'miauport_hoehle',
+      },
+    ],
     rewards: [{ giveCoins: 70 }, { giveItem: 'tagebuchseite' }],
   },
 

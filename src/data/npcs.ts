@@ -226,7 +226,10 @@ export const NPCS: Record<string, NpcDef> = {
     },
     dialogue: [
       { showIf: { bossDefeated: 'dornenkater' }, node: 'bork_danach' },
-      { showIf: { questState: 'q_laterne', state: 'completed' }, node: 'bork_laterne_fertig' },
+      // Die Abgabe haengt am Gegenstand, nicht am Queststatus - sonst waere
+      // der Knoten nur sichtbar, wenn die Quest schon abgeschlossen ist.
+      { showIf: { hasItem: 'laterne' }, node: 'bork_laterne_fertig' },
+      { showIf: { questState: 'q_laterne', state: 'completed' }, node: 'bork_laterne_danach' },
       { showIf: { questState: 'q_laterne', state: 'active' }, node: 'bork_laterne_aktiv' },
       { node: 'bork_standard' },
     ],
@@ -257,7 +260,9 @@ export const NPCS: Record<string, NpcDef> = {
       { item: 'schuppenhalsband', price: 130, stock: 1 },
     ],
     dialogue: [
-      { showIf: { questState: 'q_minen', state: 'completed' }, node: 'ambra_dankbar' },
+      { showIf: { questState: 'q_minen', state: 'completed' }, node: 'ambra_danach' },
+      // Ausloeser ist Stolls Gestaendnis, nicht der Abschluss der Quest.
+      { showIf: { flag: 'ambra_wahrheit' }, node: 'ambra_dankbar' },
       { showIf: { questState: 'q_minen', state: 'active' }, node: 'ambra_wartet' },
       { node: 'ambra_standard' },
     ],
@@ -298,7 +303,21 @@ export const NPCS: Record<string, NpcDef> = {
       scale: 1.16,
     },
     dialogue: [
-      { showIf: { flag: 'arena_gewonnen' }, node: 'grimm_sieger' },
+      { showIf: { flag: 'arena_gewonnen' }, node: 'grimm_danach' },
+      // Gewonnen hat, wer alle fuenf Runden-Gegner erledigt hat. Vorher haing
+      // der Sieg an genau dem Flag, das er selbst setzen sollte.
+      {
+        showIf: {
+          all: [
+            { slain: 'arena_1' },
+            { slain: 'arena_2' },
+            { slain: 'arena_3' },
+            { slain: 'arena_4' },
+            { slain: 'arena_5' },
+          ],
+        },
+        node: 'grimm_sieger',
+      },
       { showIf: { flag: 'arena_gestartet' }, node: 'grimm_laeuft' },
       { node: 'grimm_einladung' },
     ],
@@ -324,7 +343,7 @@ export const NPCS: Record<string, NpcDef> = {
     },
     dialogue: [
       { showIf: { flag: 'ueberfahrt_bezahlt' }, node: 'welle_bereit' },
-      { showIf: { questState: 'q_fischvorrat', state: 'completed' }, node: 'welle_angebot' },
+      { showIf: { bossDefeated: 'tiefenkralle' }, node: 'welle_angebot' },
       { node: 'welle_standard' },
     ],
   },
@@ -414,8 +433,19 @@ export const NPCS: Record<string, NpcDef> = {
       scale: 1.04,
     },
     dialogue: [
-      { showIf: { hasItem: 'nachtherz' }, node: 'luna_herz' },
-      { showIf: { bossDefeated: 'spiegelkatze' }, node: 'luna_nach_spiegel' },
+      // Die Mondkralle steht bewusst ganz oben: sie ist Pflicht fuer alles,
+      // was danach kommt. Stuende der Splitter-Dialog davor, wuerde er sie
+      // ueberdecken, sobald der Spieler drei Splitter gefunden hat - und die
+      // Faehigkeit waere fuer immer verloren.
+      {
+        showIf: {
+          all: [{ bossDefeated: 'spiegelkatze' }, { not: { hasAbility: 'mondkralle' } }],
+        },
+        node: 'luna_nach_spiegel',
+      },
+      // Das Herz selbst traegt der Spieler nie - wohl aber Splitter davon.
+      { showIf: { hasItem: 'mondsplitter', count: 3 }, node: 'luna_herz' },
+      { showIf: { bossDefeated: 'spiegelkatze' }, node: 'luna_danach' },
       { showIf: { flag: 'luna_getroffen' }, node: 'luna_aufgabe' },
       { node: 'luna_erstes_mal' },
     ],

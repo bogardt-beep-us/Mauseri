@@ -172,6 +172,15 @@ export const SCHNURRWALD_DIALOGUES: Record<string, DialogueNode> = {
     effects: [{ takeItem: 'laterne' }, { completeQuest: 'q_laterne' }],
   },
 
+  bork_laterne_danach: {
+    id: 'bork_laterne_danach',
+    lines: [
+      { speaker: 'foerster_bork', text: 'Ich geh heute wieder tiefer rein. Mit Licht diesmal.' },
+      { speaker: 'foerster_bork', text: 'Wenn du auf der Lichtung was findest - sag mir Bescheid.' },
+      { speaker: 'foerster_bork', text: 'Und wenn du da was WECKST, sag mir vorher Bescheid.' },
+    ],
+  },
+
   bork_danach: {
     id: 'bork_danach',
     lines: [

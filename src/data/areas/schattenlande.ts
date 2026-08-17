@@ -37,7 +37,7 @@ export const SCHATTENLANDE_AREAS: AreaDef[] = [
       '##############-###-###########',
     ],
     objects: [
-      { type: 'portal', x: 14, y: 0, to: 'mondsee_ruine', toX: 26, toY: 3, facing: 'up' },
+      { type: 'portal', x: 14, y: 0, to: 'mondsee_ruine', toX: 26, toY: 4, facing: 'up' },
       { type: 'portal', x: 14, y: 18, to: 'schattenlande_dorf', toX: 15, toY: 1, facing: 'down' },
       {
         type: 'portal',

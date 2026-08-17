@@ -59,6 +59,14 @@ export const KRATZFELS_DIALOGUES: Record<string, DialogueNode> = {
     effects: [{ completeQuest: 'q_minen' }],
   },
 
+  ambra_danach: {
+    id: 'ambra_danach',
+    lines: [
+      { speaker: 'schmiedin_ambra', text: 'Er sitzt jeden Abend hier. Redet immer noch nicht viel.' },
+      { speaker: 'schmiedin_ambra', text: 'Aber er sitzt hier. Das ist der Unterschied.', mood: 'happy' },
+    ],
+  },
+
   // --- Stoll ---------------------------------------------------------------
   stoll_standard: {
     id: 'stoll_standard',
@@ -135,6 +143,16 @@ export const KRATZFELS_DIALOGUES: Record<string, DialogueNode> = {
       { speaker: 'arenameister_grimm', text: 'Ich hab noch schlimmere Runden im Keller.' },
     ],
     effects: [{ setFlag: 'arena_gewonnen' }, { completeQuest: 'q_arena' }],
+  },
+
+  grimm_danach: {
+    id: 'grimm_danach',
+    lines: [
+      { speaker: 'arenameister_grimm', text: 'Der Siebte.', mood: 'happy' },
+      { speaker: 'arenameister_grimm', text: 'Ich fuehr die Liste seit elf Jahren. Du stehst jetzt drauf.' },
+      { speaker: 'pookie', text: 'Auf der LISTE?', mood: 'scared' },
+      { speaker: 'arenameister_grimm', text: 'Auf der guten.' },
+    ],
   },
 
   // --- Grubenherz ----------------------------------------------------------

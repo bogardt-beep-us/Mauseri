@@ -65,7 +65,9 @@ for (const [id, script] of Object.entries(SCRIPTS)) {
     if (step.do === 'boss' && !BOSSES[step.boss]) {
       meldung(fehler, `Skript "${id}": Boss "${step.boss}" ist unbekannt.`);
     }
-    if (step.do === 'spawn' && !NPCS[step.npc]) {
+    // "pookie" ist kein NPC, sondern der Begleiter - er wird ueber denselben
+    // Schritt wieder in die Gruppe geholt (siehe WorldScene.spawnNpc).
+    if (step.do === 'spawn' && step.npc !== 'pookie' && !NPCS[step.npc]) {
       meldung(fehler, `Skript "${id}": NPC "${step.npc}" ist unbekannt.`);
     }
     if (step.do === 'effects') pruefeEffekte(step.effects, `Skript "${id}"`);

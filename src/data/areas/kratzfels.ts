@@ -196,8 +196,10 @@ export const KRATZFELS_AREAS: AreaDef[] = [
         id: 'stoll_chest_1',
         x: 10,
         y: 6,
-        contents: [{ item: 'minenschluessel', count: 1 }],
-        requiresItem: 'brotlaib',
+        contents: [
+          { item: 'tagebuchseite', count: 1 },
+          { item: 'heilmilch', count: 1 },
+        ],
       },
       {
         type: 'sign',

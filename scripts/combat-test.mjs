@@ -99,6 +99,20 @@ try {
 
   // --- 3. Faehigkeit einsetzen --------------------------------------------
 
+  // Der Rueckstoss kann die Figur in einen Trigger geschoben haben; dann laeuft
+  // eine Zwischensequenz und die Steuerung ist ausgeblendet. Erst abwarten.
+  for (let i = 0; i < 40; i++) {
+    const beschaeftigt = await page.evaluate(() => {
+      const d = window.__mauseriDebug;
+      return Boolean(d?.dialogueActive || d?.scriptRunning);
+    });
+    if (!beschaeftigt && (await page.locator('.dialog-box').count()) === 0) break;
+    if ((await page.locator('.dialog-schicht').count()) > 0) {
+      await page.click('.dialog-schicht', { position: { x: 206, y: 760 } });
+    }
+    await page.waitForTimeout(200);
+  }
+
   await page.evaluate(() => window.__mauseriDebug?.grantAbility?.('katzenflink'));
   await page.waitForTimeout(400);
 

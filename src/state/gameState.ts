@@ -10,6 +10,7 @@
 import type { AbilityId, AreaId, Condition, Effect, QuestId, QuestState, RegionId } from '@/data/types';
 import { SAVE_KEY } from '@/core/constants';
 import { bus } from '@/core/EventBus';
+import { QUESTS } from '@/data/quests';
 
 export interface InventoryEntry {
   item: string;
@@ -216,6 +217,9 @@ class GameStateStore {
     if ('bossDefeated' in condition) {
       return this.isBossDefeated(condition.bossDefeated);
     }
+    if ('slain' in condition) {
+      return this.isSlain(condition.slain);
+    }
     if ('secretsFound' in condition) {
       return this.data.secrets.length >= condition.secretsFound;
     }
@@ -338,9 +342,59 @@ class GameStateStore {
   completeQuest(id: QuestId): void {
     if (this.questState(id) === 'completed') return;
     this.update((d) => {
-      d.quests[id] = { state: 'completed', step: d.quests[id]?.step ?? 0 };
+      d.quests[id] = { state: 'completed', step: QUESTS[id]?.steps.length ?? 0 };
     });
     bus.emit('quest:updated', { questId: id, state: 'completed' });
+
+    // Belohnungen ausschuetten. Der Schutz gegen Rekursion ist noetig, weil
+    // eine Belohnung ihrerseits eine Quest starten oder abschliessen kann.
+    const quest = QUESTS[id];
+    if (quest?.rewards && !this.belohnungLaeuft.has(id)) {
+      this.belohnungLaeuft.add(id);
+      try {
+        applyEffects(quest.rewards);
+      } finally {
+        this.belohnungLaeuft.delete(id);
+      }
+    }
+  }
+
+  private belohnungLaeuft = new Set<QuestId>();
+
+  /**
+   * Bringt alle laufenden Quests auf den Stand der Welt.
+   *
+   * Ohne das muesste jeder Questschritt von einem Dialog von Hand
+   * weitergeschaltet werden - und genau das war an mehreren Stellen vergessen
+   * worden, wodurch Quests fuer immer offen blieben. Jetzt gilt: ein Schritt
+   * ist erledigt, sobald seine Bedingung wahr ist; sind alle Schritte
+   * erledigt, ist die Quest abgeschlossen.
+   */
+  syncQuests(): void {
+    for (const quest of Object.values(QUESTS)) {
+      if (this.questState(quest.id) !== 'active') continue;
+
+      let schritt = this.questStep(quest.id);
+      let veraendert = false;
+
+      // Mehrere Schritte koennen gleichzeitig erfuellt sein (z. B. wenn ein
+      // Dialog zwei Flags auf einmal setzt), deshalb in einer Schleife.
+      while (schritt < quest.steps.length && this.check(quest.steps[schritt]!.done)) {
+        schritt++;
+        veraendert = true;
+      }
+
+      if (!veraendert) continue;
+
+      if (schritt >= quest.steps.length) {
+        this.completeQuest(quest.id);
+      } else {
+        this.update((d) => {
+          d.quests[quest.id] = { state: 'active', step: schritt };
+        });
+        bus.emit('quest:updated', { questId: quest.id, state: 'advanced' });
+      }
+    }
   }
 
   damage(amount: number): number {

@@ -73,7 +73,8 @@ export const PUZZLES: Record<string, PuzzleDef> = {
     name: 'Die Loren der alten Mine',
     hint: 'Die Platten sind fuer Gewicht gemacht, nicht fuer Pfoten. Was steht hier sonst noch herum?',
     solvedText: 'Es knirscht - und das Gitter zur Tiefe hebt sich.',
-    rewards: [{ giveItem: 'minenschluessel' }],
+    // Der Minenschluessel kommt von Stoll; hier waere er doppelt.
+    rewards: [{ giveCoins: 40 }],
   },
 
   kratzfels_schmelze: {
@@ -94,6 +95,7 @@ export const PUZZLES: Record<string, PuzzleDef> = {
     name: 'Die drei Laternen',
     hint: 'Schmuggler markieren ihre Wege. Drei Laternen, aber nur zwei brennen - wo ist die dritte?',
     solvedText: 'Die Laternen zeigen den Weg durch die Untiefen.',
+    rewards: [{ setFlag: 'schluck_bestaetigt' }],
   },
 
   miauport_flut: {
@@ -103,7 +105,11 @@ export const PUZZLES: Record<string, PuzzleDef> = {
     targetLevel: 2,
     name: 'Der Wasserstand',
     hint: 'Zu wenig Wasser, und du kommst nicht drueber. Zu viel, und du kommst nicht durch. Was liegt dazwischen?',
-    solvedText: 'Das Wasser steht genau richtig.',
+    solvedText: 'Das Wasser sinkt. Auf dem Grund liegt etwas, das lange niemand gesehen hat.',
+    rewards: [
+      { giveItem: 'tagebuchseite' },
+      { giveCoins: 60 },
+    ],
   },
 
   // --- Mondsee ------------------------------------------------------------
