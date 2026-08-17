@@ -51,9 +51,13 @@ export const SCHATTENLANDE_AREAS: AreaDef[] = [
         lockedText: 'Der schwarze Nebel ist hier zu dicht. Erst muss das Dorf wieder brennen.',
       },
 
-      // Der Wendepunkt der Geschichte
-      { type: 'trigger', id: 'trennung', x: 12, y: 8, w: 5, h: 3, script: 'trennung', once: true },
-      { type: 'trigger', id: 'schattenlande_ankunft', x: 12, y: 2, w: 5, h: 2, script: 'schattenlande_ankunft', once: true },
+      // Der Wendepunkt der Geschichte. Beide Ausloeser spannen sich ueber die
+      // volle Kartenbreite: die Karte ist offen genug, dass man sonst rechts
+      // am Nebel vorbeilaufen und die Trennung ueberspringen koennte - und
+      // danach saehe man Ascha mit Pookie an der Seite, waehrend Mauseri
+      // erzaehlt, der Nebel habe ihn geholt.
+      { type: 'trigger', id: 'schattenlande_ankunft', x: 1, y: 2, w: 28, h: 2, script: 'schattenlande_ankunft', once: true },
+      { type: 'trigger', id: 'trennung', x: 1, y: 8, w: 28, h: 3, script: 'trennung', once: true },
 
       { type: 'enemy', enemy: 'schattenmaus', x: 24, y: 5, leash: 7 },
       { type: 'enemy', enemy: 'nebelschleicher', x: 6, y: 13, leash: 6 },

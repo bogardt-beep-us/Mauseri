@@ -311,9 +311,9 @@ export const MIEZLINGEN_AREAS: AreaDef[] = [
       {
         type: 'trigger',
         id: 'tutorial_kampf',
-        x: 12,
+        x: 1,
         y: 4,
-        w: 3,
+        w: 28,
         h: 2,
         script: 'tutorial_kampf',
         once: true,

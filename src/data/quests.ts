@@ -286,9 +286,11 @@ export const QUESTS: Record<QuestId, QuestDef> = {
     summary:
       'Folio sammelt die verstreuten Seiten. Wer alle findet, erfaehrt, was wirklich geschehen ist.',
     giver: 'bibliothekar_folio',
-    steps: [{ text: 'Finde alle sieben Tagebuchseiten.', done: { hasItem: 'tagebuchseite', count: 7 } }],
+    steps: [
+      { text: 'Finde alle sieben Tagebuchseiten.', done: { hasItem: 'tagebuchseite', count: 7 } },
+      { text: 'Lass sie dir von Folio vorlesen.', done: { flag: 'folio_alles_gelesen' }, hintArea: 'schloss_bibliothek' },
+    ],
     rewards: [
-      { setFlag: 'folio_alles_gelesen' },
       { giveItem: 'mondstahlkralle' },
       { toast: 'Du kennst jetzt die ganze Geschichte.', kind: 'quest' },
     ],

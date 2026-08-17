@@ -68,6 +68,17 @@ export const KRATZFELS_DIALOGUES: Record<string, DialogueNode> = {
   },
 
   // --- Stoll ---------------------------------------------------------------
+  stoll_erstes_mal: {
+    id: 'stoll_erstes_mal',
+    lines: [
+      { speaker: 'bergmann_stoll', text: 'Ich kenn jeden Stollen hier. Jeden.' },
+      { speaker: 'bergmann_stoll', text: 'Frag mich was ueber Gestein. Los. Irgendwas.' },
+      { speaker: 'mauseri', text: 'Ist der Berg gefaehrlich?' },
+      { speaker: 'bergmann_stoll', text: '...' },
+      { speaker: 'bergmann_stoll', text: 'Frag was anderes.', mood: 'scared' },
+    ],
+  },
+
   stoll_standard: {
     id: 'stoll_standard',
     lines: [

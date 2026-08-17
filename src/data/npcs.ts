@@ -284,7 +284,11 @@ export const NPCS: Record<string, NpcDef> = {
     dialogue: [
       { showIf: { puzzleSolved: 'kratzfels_mine' }, node: 'stoll_beeindruckt' },
       { showIf: { hasItem: 'minenschluessel' }, node: 'stoll_schluessel' },
-      { node: 'stoll_standard' },
+      // Das Gestaendnis setzt voraus, dass Ambra Mauseri von den naechtlichen
+      // Gaengen erzaehlt hat - sonst konfrontiert Mauseri ihn mit Wissen,
+      // das sie nicht haben kann.
+      { showIf: { questState: 'q_minen', state: 'active' }, node: 'stoll_standard' },
+      { node: 'stoll_erstes_mal' },
     ],
   },
 
@@ -410,7 +414,9 @@ export const NPCS: Record<string, NpcDef> = {
     },
     dialogue: [
       { showIf: { flag: 'knopf_gestellt' }, node: 'knopf_gestellt' },
-      { node: 'knopf_erstes_mal' },
+      // Erst wenn Salz vom Diebstahl erzaehlt hat, erkennt Mauseri das Netz.
+      { showIf: { questState: 'q_fischvorrat', state: 'active' }, node: 'knopf_erstes_mal' },
+      { node: 'knopf_ausweichend' },
     ],
   },
 
@@ -533,7 +539,19 @@ export const NPCS: Record<string, NpcDef> = {
       scale: 0.98,
     },
     dialogue: [
-      { showIf: { flag: 'folio_alles_gelesen' }, node: 'folio_alles' },
+      { showIf: { flag: 'folio_alles_gelesen' }, node: 'folio_danach' },
+      // Die Vorlesung haengt an den Seiten selbst. Vorher stand sie hinter
+      // dem Flag, das sie erst setzt - die Szene lief also nach der
+      // Belohnung statt davor.
+      //
+      // Zusaetzlich muss Folio vorher ueberhaupt einmal geredet haben: wer die
+      // sieben Seiten findet, bevor er die Bibliothek betritt, uebersprang
+      // sonst die Vorstellung - und mit ihr den `startQuest`, an dem die
+      // Belohnung haengt. Folio las vor und gab nichts.
+      {
+        showIf: { all: [{ flag: 'folio_getroffen' }, { hasItem: 'tagebuchseite', count: 7 }] },
+        node: 'folio_alles',
+      },
       { showIf: { flag: 'folio_getroffen' }, node: 'folio_erzaehlt' },
       { node: 'folio_erstes_mal' },
     ],

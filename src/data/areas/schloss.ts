@@ -330,8 +330,12 @@ export const SCHLOSS_AREAS: AreaDef[] = [
         h: 11,
         script: 'abspann',
         once: true,
+        // Welches Ende laeuft, haengt daran, ob der Spieler Nyxaras Tagebuch
+        // vollstaendig gelesen hat - nicht an einer beliebigen Zahl von
+        // Geheimnissen. Im wahren Ende beruft Mauseri sich woertlich auf die
+        // sieben Seiten; das darf sie nur, wenn sie sie auch kennt.
         showIf: {
-          all: [{ bossDefeated: 'nyxara' }, { not: { secretsFound: 8 } }],
+          all: [{ bossDefeated: 'nyxara' }, { not: { flag: 'folio_alles_gelesen' } }],
         },
       },
       {
@@ -344,7 +348,7 @@ export const SCHLOSS_AREAS: AreaDef[] = [
         script: 'abspann_wahr',
         once: true,
         showIf: {
-          all: [{ bossDefeated: 'nyxara' }, { secretsFound: 8 }],
+          all: [{ bossDefeated: 'nyxara' }, { flag: 'folio_alles_gelesen' }],
         },
       },
 

@@ -119,6 +119,17 @@ export const MIAUPORT_DIALOGUES: Record<string, DialogueNode> = {
   },
 
   // --- Knopf ---------------------------------------------------------------
+  knopf_ausweichend: {
+    id: 'knopf_ausweichend',
+    lines: [
+      { speaker: 'schmuggler_knopf', text: 'Ich verkauf nichts. Ich hab nichts. Geh weiter.', mood: 'scared' },
+      { speaker: 'mauseri', text: 'Ich wollte nur fragen, wie es Ihnen geht.' },
+      { speaker: 'schmuggler_knopf', text: '...', mood: 'surprised' },
+      { speaker: 'schmuggler_knopf', text: 'Das fragt hier keiner.' },
+      { speaker: 'schmuggler_knopf', text: 'Geh trotzdem weiter.', mood: 'sad' },
+    ],
+  },
+
   knopf_erstes_mal: {
     id: 'knopf_erstes_mal',
     lines: [

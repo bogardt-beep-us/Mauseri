@@ -38,7 +38,8 @@ export const SCHNURRWALD_AREAS: AreaDef[] = [
       { type: 'portal', x: 14, y: 0, to: 'miezlingen_rand', toX: 21, toY: 19, facing: 'up' },
       { type: 'portal', x: 21, y: 18, to: 'schnurrwald_pfad', toX: 14, toY: 1, facing: 'down' },
 
-      { type: 'trigger', id: 'wald_eintritt', x: 13, y: 3, w: 3, h: 2, script: 'wald_eintritt', once: true },
+      // Volle Breite, damit die Szene nicht durch einen Bogen umgangen wird.
+      { type: 'trigger', id: 'wald_eintritt', x: 1, y: 3, w: 28, h: 2, script: 'wald_eintritt', once: true },
 
       { type: 'npc', npc: 'einsiedler_moos', x: 6, y: 11, facing: 'right' },
 

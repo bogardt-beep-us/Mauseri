@@ -258,6 +258,37 @@ for (const npc of Object.values(NPCS)) {
 }
 
 // ---------------------------------------------------------------------------
+// 5b. Verdeckte Dialogeintraege
+// ---------------------------------------------------------------------------
+//
+// Ein NPC spielt den ERSTEN Eintrag, dessen Bedingung passt. Ein Eintrag ist
+// damit tot, wenn ueber ihm einer steht, dessen Bedingung immer schon erfuellt
+// ist, wenn seine eigene es ist. Der haeufigste Fall: der obere Eintrag
+// verlangt ein Flag, der untere dasselbe Flag und noch etwas.
+
+/** Ist `a` immer wahr, wenn `b` wahr ist? Bewusst konservativ. */
+function impliziert(a, b) {
+  if (!a) return true; // Ein Eintrag ohne Bedingung verdeckt alles darunter.
+  if (!b) return false;
+  if ('all' in b) return b.all.some((teil) => impliziert(a, teil));
+  if ('all' in a) return a.all.every((teil) => impliziert(teil, b));
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+for (const npc of Object.values(NPCS)) {
+  for (let unten = 1; unten < npc.dialogue.length; unten++) {
+    for (let oben = 0; oben < unten; oben++) {
+      if (!impliziert(npc.dialogue[oben].showIf, npc.dialogue[unten].showIf)) continue;
+      fehler.push(
+        `NPC "${npc.id}": Eintrag "${npc.dialogue[unten].node}" wird nie gespielt - ` +
+          `"${npc.dialogue[oben].node}" steht darueber und trifft immer schon zu.`,
+      );
+      break;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // 6. Objekte, deren Bedingung erst auf derselben Karte wahr wird
 // ---------------------------------------------------------------------------
 
@@ -293,6 +324,78 @@ for (const area of ALL_AREAS) {
       hinweise.push(
         `Karte "${area.id}": ${o.type}${o.id ? ` "${o.id}"` : ''} haengt am Boss "${c.bossDefeated}" auf derselben Karte - muss zur Laufzeit nachgezogen werden.`,
       );
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 6b. Spricht Pookie, waehrend ihn der Nebel hat?
+//
+// Zwischen der Trennung und dem Wiedersehen ist Pookie nicht in der Gruppe.
+// Jede Zeile, die er in diesem Fenster spricht, ist ein Widerspruch - und das
+// Fenster liegt genau auf den Schattenlande-Karten, die der Spieler dann
+// zwangslaeufig durchquert.
+// ---------------------------------------------------------------------------
+
+const OHNE_POOKIE = ['schattenlande_pfad', 'schattenlande_dorf', 'schattenlande_ruine'];
+
+/** Alle Knoten, die von einem Startknoten aus erreichbar sind (then-Ketten). */
+function dialogKette(startId, gesehen = new Set()) {
+  if (!startId || gesehen.has(startId)) return gesehen;
+  const node = DIALOGUES[startId];
+  if (!node) return gesehen;
+  gesehen.add(startId);
+  if (node.then) dialogKette(node.then, gesehen);
+  for (const w of node.choices ?? []) if (w.then) dialogKette(w.then, gesehen);
+  return gesehen;
+}
+
+/** Ist dieser Knoten dadurch abgesichert, dass Pookie schon zurueck ist? */
+const nurNachWiedersehen = (cond) => {
+  if (!cond) return false;
+  if ('flag' in cond) return cond.flag === 'pookie_zurueck' && cond.value !== false;
+  if ('bossDefeated' in cond) return cond.bossDefeated === 'nebelfuerst';
+  if ('all' in cond) return cond.all.some(nurNachWiedersehen);
+  return false;
+};
+
+for (const areaId of OHNE_POOKIE) {
+  const area = AREAS[areaId];
+  if (!area) continue;
+
+  for (const o of area.objects ?? []) {
+    // Die Szenen, in denen Pookie noch bzw. wieder da ist, sind ausgenommen.
+    if (
+      o.type === 'trigger' &&
+      ['trennung', 'wiedersehen', 'nebelfuerst_erwacht', 'schattenlande_ankunft'].includes(o.script)
+    ) {
+      continue;
+    }
+    if (nurNachWiedersehen(o.showIf)) continue;
+
+    const startknoten = [];
+    if (o.type === 'npc') {
+      for (const e of NPCS[o.npc]?.dialogue ?? []) {
+        if (!nurNachWiedersehen(e.showIf)) startknoten.push(e.node);
+      }
+    }
+    if (o.type === 'trigger') {
+      for (const step of SCRIPTS[o.script]?.steps ?? []) {
+        if (step.do === 'dialogue') startknoten.push(step.node);
+      }
+    }
+
+    for (const start of startknoten) {
+      for (const knotenId of dialogKette(start)) {
+        const node = DIALOGUES[knotenId];
+        if (!node?.lines.some((l) => l.speaker === 'pookie')) continue;
+        // Die Ankunftsszene laeuft noch vor der Trennung.
+        if (knotenId === 'schattenlande_ankunft_1') continue;
+        fehler.push(
+          `Dialog "${knotenId}" auf Karte "${areaId}": Pookie spricht, obwohl er zwischen ` +
+            `Trennung und Wiedersehen nicht in der Gruppe ist.`,
+        );
+      }
     }
   }
 }
@@ -402,6 +505,9 @@ function synchronisiereQuests() {
   }
 }
 
+/** Bereits eingesammelte Truhen und Fundstuecke. */
+const geerntet = new Set();
+
 let runde = 0;
 let veraendert = true;
 while (veraendert && runde < 60) {
@@ -419,15 +525,24 @@ while (veraendert && runde < 60) {
     for (const o of area.objects ?? []) {
       if (!pruefeBedingung(o.showIf)) continue;
 
+      // Jede Truhe und jedes Fundstueck nur einmal - sonst wachsen die
+      // Stueckzahlen in jeder Runde weiter, und Bedingungen wie "sieben
+      // Tagebuchseiten" waeren immer erfuellt, egal wie viele es wirklich gibt.
+      const schluessel = `${areaId}:${o.type}:${o.id ?? `${o.x},${o.y}`}`;
+
       switch (o.type) {
         case 'chest':
-          if (!o.requiresItem || hatItem(o.requiresItem)) {
+          if (!geerntet.has(schluessel) && (!o.requiresItem || hatItem(o.requiresItem))) {
+            geerntet.add(schluessel);
             for (const c of o.contents) if (c.item !== 'coins') gibItem(c.item, c.count ?? 1);
           }
           break;
         case 'pickup':
-          gibItem(o.item, o.count ?? 1);
-          welt.secrets++;
+          if (!geerntet.has(schluessel)) {
+            geerntet.add(schluessel);
+            gibItem(o.item, o.count ?? 1);
+            welt.secrets++;
+          }
           break;
         case 'enemy':
           if (o.permanent && o.id) welt.slain.add(o.id);
@@ -483,6 +598,46 @@ while (veraendert && runde < 60) {
     [...welt.quests.entries()].sort().join(),
   ]);
   veraendert = vorher !== nachher;
+}
+
+// Mit DEBUG_ITEMS=1 laesst sich nachsehen, wie viele Exemplare eines
+// Gegenstands im Durchlauf ueberhaupt zusammenkommen. Nuetzlich, wenn eine
+// Bedingung wie "sieben Tagebuchseiten" nicht aufgeht.
+if (process.env.DEBUG_ITEMS) {
+  console.log('--- Im Durchlauf gesammelte Gegenstaende ---');
+  for (const [id, n] of [...welt.items].sort()) console.log(`  ${id}: ${n}`);
+  console.log('');
+}
+
+// Eine Quest, deren Auftraggeber sie nie vergibt, kann niemand abschliessen.
+// Der haeufigste Weg dahin: ein spaeterer Dialogeintrag steht ueber dem
+// Eintrag mit `startQuest` und verdeckt ihn, sobald seine Bedingung frueher
+// erfuellt ist.
+for (const quest of Object.values(QUESTS)) {
+  if (!quest.giver) continue;
+  if (welt.quests.has(quest.id)) continue;
+  const npc = NPCS[quest.giver];
+  const vergibt = (npc?.dialogue ?? []).some((e) => startetQuest(e.node, quest.id));
+  if (vergibt) {
+    fehler.push(
+      `Quest "${quest.id}" wird von "${quest.giver}" zwar vergeben, kommt im ` +
+        `Durchlauf aber nie an - vermutlich verdeckt ein Eintrag weiter oben ` +
+        `in seiner Dialogliste den Eintrag mit "startQuest".`,
+    );
+  }
+}
+
+/** Setzt dieser Dialogknoten (oder seine Fortsetzung) die Quest in Gang? */
+function startetQuest(id, questId, tiefe = 0) {
+  const node = DIALOGUES[id];
+  if (!node || tiefe > 20) return false;
+  const inEffekten = (effekte) => (effekte ?? []).some((e) => e.startQuest === questId);
+  if (inEffekten(node.effects)) return true;
+  for (const w of node.choices ?? []) {
+    if (inEffekten(w.effects)) return true;
+    if (w.then && startetQuest(w.then, questId, tiefe + 1)) return true;
+  }
+  return node.then ? startetQuest(node.then, questId, tiefe + 1) : false;
 }
 
 const ZIEL = 'schloss_thron';

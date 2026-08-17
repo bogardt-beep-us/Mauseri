@@ -77,6 +77,18 @@ export const SCHLOSS_DIALOGUES: Record<string, DialogueNode> = {
       { speaker: 'bibliothekar_folio', text: 'Das hat in neunzehn Jahren niemand gesagt.' },
       { speaker: 'bibliothekar_folio', text: 'Nimm das. Es lag in ihrem Schrank. Sie hat es nie benutzt.' },
     ],
+    effects: [{ setFlag: 'folio_alles_gelesen' }],
+  },
+
+  folio_danach: {
+    id: 'folio_danach',
+    lines: [
+      { speaker: 'bibliothekar_folio', text: 'Ich hab die Seiten geordnet und gebunden.' },
+      { speaker: 'bibliothekar_folio', text: 'Falls sie zurueckkommt, liegt es hier. Auf ihrem Platz.' },
+      { speaker: 'mauseri', text: 'Sie glauben, sie kommt zurueck?' },
+      { speaker: 'bibliothekar_folio', text: 'Ich bin Bibliothekar, Mauseri.', mood: 'happy' },
+      { speaker: 'bibliothekar_folio', text: 'Ich habe eine sehr lange Vorstellung von Geduld.' },
+    ],
   },
 
   // --- Mira ----------------------------------------------------------------

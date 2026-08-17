@@ -50,7 +50,7 @@ export const BOSSE_DIALOGUES: Record<string, DialogueNode> = {
     lines: [
       { speaker: 'stimme', text: 'Zurueck in den Stein also.' },
       { speaker: 'stimme', text: 'Kleine Katze. Eine Frage, bevor ich schlafe.' },
-      { speaker: 'stimme', text: 'Warum gehst du nach Norden?' },
+      { speaker: 'stimme', text: 'Warum gehst du weiter?' },
       { speaker: 'mauseri', text: 'Weil jemand aufgehalten werden muss.' },
       { speaker: 'stimme', text: 'Aufgehalten.', mood: 'sad' },
       { speaker: 'stimme', text: 'Ich haette gesagt: gefunden.' },
