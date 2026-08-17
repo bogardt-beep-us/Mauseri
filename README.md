@@ -176,11 +176,34 @@ auf, wenn jemand die betroffene Stelle im Spiel erreicht. Deshalb hängen vor
 jedem Build zwei Prüfschritte:
 
 ```bash
-npm run check           # Karten + Inhalte + Typen
+npm run check           # alles zusammen, hängt vor jedem Build
 npm run check:maps      # Zeilenlängen, unbekannte Zeichen, Objekte in Wänden,
                         # Portale, die ins Leere oder in Wände zeigen
 npm run check:content   # fehlende Dialogknoten, unbekannte Sprecher, Items,
                         # Quests, Rätsel ohne Elemente, tote Skripte
+npm run check:logic     # ob das Spiel Sinn ergibt (siehe unten)
+```
+
+`check:logic` ist das wichtigste der drei. Es prüft nicht, ob Daten existieren,
+sondern ob sie zusammen ein spielbares Spiel ergeben:
+
+- Ist jede Karte vom Startraum aus erreichbar?
+- Wird jedes abgefragte Flag irgendwo gesetzt?
+- Ist jeder Gegenstand, den eine Tür oder Truhe verlangt, zu bekommen?
+- Gibt es zirkuläre Dialoge — ein Knoten setzt Flag X, ist aber nur sichtbar,
+  wenn X schon gesetzt ist?
+- Wird jede Fähigkeit irgendwo verliehen, und ist jeder Gegner mit Schild
+  besiegbar?
+
+Zum Schluss läuft ein **symbolischer Durchlauf**: Ausgehend vom Startraum wird
+wiederholt eingesammelt, was gerade erreichbar ist — Gegenstände, Rätsel, Bosse,
+Dialoge — und geprüft, welche Türen sich dadurch geöffnet haben, bis sich nichts
+mehr ändert. Bleibt der Thronsaal draußen, gibt es irgendwo eine Verriegelung,
+die sich nicht lösen lässt.
+
+```
+Durchspielbarkeit: Thronsaal erreicht, Nyxara besiegt.
+36/36 Karten, 19/19 Quests abschliessbar, 5/5 Faehigkeiten, 29 Durchlaeufe.
 ```
 
 Browsertests gegen den gebauten Stand (Preview-Server muss laufen):
