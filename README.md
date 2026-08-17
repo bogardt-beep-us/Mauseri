@@ -8,6 +8,11 @@ warum.
 Das Spiel läuft ohne Installation im Browser, ist für das Handy gebaut und
 funktioniert nach dem ersten Laden auch offline.
 
+**▶ Spielen: https://bogardt-beep-us.github.io/Mauseri/**
+
+Auf dem Handy über „Zum Homebildschirm hinzufügen" installierbar — danach
+startet es wie eine App und läuft auch ohne Verbindung.
+
 ---
 
 ## Schnellstart
