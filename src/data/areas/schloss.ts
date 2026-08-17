@@ -318,13 +318,16 @@ export const SCHLOSS_AREAS: AreaDef[] = [
       { type: 'trigger', id: 'finale', x: 12, y: 12, w: 7, h: 4, script: 'finale', once: true },
 
       // Nach dem Sieg: der Abschluss der Geschichte
+      // Grosszuegig gefasst: nach dem Kampf steht die Figur irgendwo im Saal,
+      // und der Abschluss darf nicht davon abhaengen, dass sie zufaellig auf
+      // ein kleines Feld laeuft.
       {
         type: 'trigger',
         id: 'abspann_ausloeser',
-        x: 12,
-        y: 6,
-        w: 7,
-        h: 4,
+        x: 8,
+        y: 3,
+        w: 14,
+        h: 11,
         script: 'abspann',
         once: true,
         showIf: {
@@ -334,10 +337,10 @@ export const SCHLOSS_AREAS: AreaDef[] = [
       {
         type: 'trigger',
         id: 'abspann_wahr_ausloeser',
-        x: 12,
-        y: 6,
-        w: 7,
-        h: 4,
+        x: 8,
+        y: 3,
+        w: 14,
+        h: 11,
         script: 'abspann_wahr',
         once: true,
         showIf: {

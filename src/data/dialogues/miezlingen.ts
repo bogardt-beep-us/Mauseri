@@ -123,6 +123,13 @@ export const MIEZLINGEN_DIALOGUES: Record<string, DialogueNode> = {
       { speaker: 'brummel', text: '...', mood: 'surprised' },
       { speaker: 'brummel', text: 'Dann steht es wirklich schlimm.', mood: 'sad' },
       { speaker: 'brummel', text: 'Hier. Fuer unterwegs. Und komm heil wieder, hoerst du.' },
+      { speaker: 'erzaehler', text: 'Brummel schiebt ein Buendel ueber den Tresen. Es ist deutlich mehr, als er sagt.' },
+    ],
+    // Vorher war von "hier, fuer unterwegs" die Rede, ohne dass etwas kam.
+    effects: [
+      { giveItem: 'fischkeks', count: 3 },
+      { giveItem: 'heilmilch', count: 1 },
+      { giveCoins: 25 },
     ],
   },
 
@@ -283,7 +290,14 @@ export const MIEZLINGEN_DIALOGUES: Record<string, DialogueNode> = {
 
   kork_shop: {
     id: 'kork_shop',
-    lines: [{ speaker: 'haendler_kork', text: 'Such dir was aus. Alles echt. Fast alles echt. Guck einfach.', mood: 'happy' }],
+    lines: [
+      { speaker: 'haendler_kork', text: 'Such dir was aus. Alles echt. Fast alles echt. Guck einfach.', mood: 'happy' },
+      { speaker: 'haendler_kork', text: 'Und wenn ich mal nicht da bin: ich zieh mit.' },
+      { speaker: 'haendler_kork', text: 'Wo Leute hingehen, geh ich hin. Das ist das ganze Geheimnis am Handel.' },
+      { speaker: 'pookie', text: 'Sie folgen UNS?', mood: 'surprised' },
+      { speaker: 'haendler_kork', text: 'Ich folge dem Geschaeft, junger Herr.' },
+      { speaker: 'haendler_kork', text: 'Dass das gerade ihr seid, ist ein gluecklicher Zufall.', mood: 'sly' },
+    ],
   },
 
   // =========================================================================

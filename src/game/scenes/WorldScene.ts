@@ -1787,11 +1787,25 @@ export class WorldScene extends Phaser.Scene implements ScriptHost {
   private maybePookieComment(): void {
     if (this.dialogue.isActive || this.scripts.isRunning) return;
 
-    // Hinweis bei ungeloesten Raetseln in der Naehe
+    // Hinweis nur, wenn der Spieler tatsaechlich vor dem Raetsel steht -
+    // sonst kommentierte Pookie es schon beim Betreten der Karte, egal wie
+    // weit weg es lag.
+    const naehe = TILE * 5;
     for (const puzzleId of this.puzzles.activePuzzleIds()) {
       if (gameState.isPuzzleSolved(puzzleId)) continue;
       const hint = this.puzzles.hintFor(puzzleId);
       if (!hint) continue;
+
+      const stehtDavor = this.objects.some((object) => {
+        const def = object.def;
+        if (!('puzzle' in def) || def.puzzle !== puzzleId) return false;
+        return (
+          Phaser.Math.Distance.Between(object.sprite.x, object.sprite.y, this.player.x, this.player.y) <
+          naehe
+        );
+      });
+      if (!stehtDavor) continue;
+
       if (this.pookie.say(`raetsel:${puzzleId}`, hint)) return;
     }
 
