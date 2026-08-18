@@ -173,6 +173,29 @@ button {
   cursor: not-allowed;
 }
 
+/* Zurueckhaltender als die Startknoepfe - Vollbild ist ein Angebot, keine
+   Aufforderung. */
+.btn-leise {
+  min-height: 46px;
+  padding: 0.6rem 1.1rem;
+  background: rgba(28, 20, 48, 0.7);
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.vollbild-hinweis {
+  max-width: 24rem;
+  margin: 0.7rem auto 0;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--panel-rand);
+  border-radius: 10px;
+  background: rgba(28, 20, 48, 0.9);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: left;
+}
+
 .btn-primaer {
   border-color: rgba(255, 217, 138, 0.55);
   background: linear-gradient(180deg, rgba(120, 92, 48, 0.92), rgba(70, 52, 30, 0.92));

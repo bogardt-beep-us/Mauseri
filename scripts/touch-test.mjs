@@ -44,6 +44,15 @@ const testApi = () => page.evaluate(() => window.__mauseriDebug ?? null);
 try {
   await page.goto(`${URL}?test=1`, { waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForSelector('.title-screen h1', { timeout: 15000 });
+
+  // Der Vollbild-Knopf muss schon HIER stehen. In der ersten Fassung gab es
+  // ihn nur im HUD - wer das Spiel oeffnete und nach Vollbild suchte, fand
+  // nichts und hielt die Funktion fuer nicht vorhanden.
+  pruefe(
+    'Vollbild-Knopf auf dem Titelbildschirm',
+    (await page.locator('.title-screen button[aria-label="Vollbild"]').count()) > 0,
+  );
+
   await page.click('text=Neues Spiel');
   await page.waitForSelector('canvas', { timeout: 15000 });
 
@@ -130,7 +139,12 @@ try {
   await page.waitForTimeout(300);
   pruefe('Zweiter Zug ueberlebt', (await page.locator('.touch-controls').count()) > 0);
 
-  // 6. Vollbild-Knopf.
+  // 6. Vollbild-Knopf. Er muss auch auf dem TITELBILDSCHIRM stehen - dort
+  //    schaltet man ihn ein, bevor man losspielt. In der ersten Fassung gab es
+  //    ihn nur im HUD, und damit fand ihn niemand.
+  pruefe('Vollbild-Knopf im HUD', (await page.locator('.hud button[aria-label="Vollbild"]').count()) > 0);
+
+  // Vollbild-Knopf im Spiel.
   const vollbild = page.locator('button[aria-label="Vollbild"]');
   pruefe('Vollbild-Knopf vorhanden', (await vollbild.count()) > 0);
   if ((await vollbild.count()) > 0) {
@@ -147,6 +161,31 @@ try {
       );
     }
   }
+  // 7. Der iPhone-Fall. Safari kennt die Fullscreen-API nicht. Der Knopf darf
+  //    deswegen NICHT verschwinden - "weg" ist fuer den Spieler nicht von
+  //    "kaputt" zu unterscheiden. Er muss stattdessen erklaeren, wie es geht.
+  const ohneApi = await context.newPage();
+  await ohneApi.addInitScript(() => {
+    // So sieht Safari auf dem iPhone aus: keine dieser Methoden existiert.
+    const proto = Element.prototype;
+    delete proto.requestFullscreen;
+    delete proto.webkitRequestFullscreen;
+  });
+  await ohneApi.goto(URL, { waitUntil: 'networkidle', timeout: 30000 });
+  await ohneApi.waitForSelector('.title-screen h1', { timeout: 15000 });
+
+  const knopfOhneApi = ohneApi.locator('.title-screen button[aria-label="Vollbild"]');
+  pruefe('Knopf bleibt auch ohne Fullscreen-API sichtbar', (await knopfOhneApi.count()) > 0);
+  if ((await knopfOhneApi.count()) > 0) {
+    await knopfOhneApi.click();
+    await ohneApi.waitForTimeout(200);
+    const hinweis = await ohneApi.locator('.vollbild-hinweis').textContent().catch(() => null);
+    pruefe(
+      'Knopf erklaert stattdessen den Weg ueber den Home-Bildschirm',
+      Boolean(hinweis && /Home-Bildschirm/.test(hinweis)),
+    );
+  }
+  await ohneApi.close();
 } catch (err) {
   pruefe('Testdurchlauf', false, String(err.message ?? err).split('\n')[0]);
 }

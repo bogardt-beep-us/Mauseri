@@ -9,6 +9,7 @@
 import { useEffect, useState } from 'react';
 import { audio } from '@/game/systems/AudioSystem';
 import { hasSavedGame } from '@/state/gameState';
+import { FullscreenButton } from './FullscreenButton';
 
 interface Props {
   onNewGame: () => void;
@@ -55,6 +56,9 @@ export function TitleScreen({ onNewGame, onContinue }: Props) {
         <button className={saveVorhanden ? 'btn' : 'btn btn-primaer'} onClick={() => starten(false)}>
           Neues Spiel
         </button>
+        {/* Gehoert hierher und nicht nur ins HUD: Vollbild schaltet man ein,
+            bevor man losspielt. Im HUD allein hat es niemand gefunden. */}
+        <FullscreenButton variante="text" />
       </div>
 
       <p className="title-hinweis">

@@ -36,12 +36,17 @@ npm run preview      # gebauten Stand lokal ansehen
 **Handy** — links auf den Bildschirm legen und ziehen: der Joystick erscheint
 unter dem Daumen. Rechts liegen die Aktionsknöpfe.
 
-Oben rechts sitzt neben dem Menü der Vollbild-Knopf (⛶). Er blendet die
+Vollbild gibt es an zwei Stellen: als Knopf auf dem **Titelbildschirm** (dort
+schaltet man es ein, bevor es losgeht) und oben rechts im HUD neben dem Menü
+(⛶). Er blendet die
 Adressleiste aus — das sind je nach Gerät 60–100 px mehr Spielfläche, und die
 Aktionsknöpfe rutschen aus dem Bereich, in dem eine Wischgeste den Browser
-statt die Katze bewegt. **Safari auf dem iPhone kennt kein Vollbild**; dort
-erscheint der Knopf nicht. Randlos wird es da über *Teilen → Zum
-Home-Bildschirm* — das Spiel ist als PWA installierbar.
+statt die Katze bewegt. **Safari auf dem iPhone kennt kein Vollbild** — das kann dort
+keine Webseite. Der Knopf bleibt trotzdem stehen und erklärt beim Antippen den
+Weg über *Teilen → Zum Home-Bildschirm*; das Spiel ist als PWA installierbar
+und läuft dann ohne Browserrahmen. (Erste Fassung blendete den Knopf aus, wenn
+der Browser nicht mitspielt — das war von „Funktion fehlt" nicht zu
+unterscheiden.)
 
 | Knopf | Wirkung |
 | --- | --- |
