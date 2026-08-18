@@ -36,6 +36,13 @@ npm run preview      # gebauten Stand lokal ansehen
 **Handy** — links auf den Bildschirm legen und ziehen: der Joystick erscheint
 unter dem Daumen. Rechts liegen die Aktionsknöpfe.
 
+Oben rechts sitzt neben dem Menü der Vollbild-Knopf (⛶). Er blendet die
+Adressleiste aus — das sind je nach Gerät 60–100 px mehr Spielfläche, und die
+Aktionsknöpfe rutschen aus dem Bereich, in dem eine Wischgeste den Browser
+statt die Katze bewegt. **Safari auf dem iPhone kennt kein Vollbild**; dort
+erscheint der Knopf nicht. Randlos wird es da über *Teilen → Zum
+Home-Bildschirm* — das Spiel ist als PWA installierbar.
+
 | Knopf | Wirkung |
 | --- | --- |
 | Kralle | Nahkampfangriff |
@@ -211,8 +218,17 @@ Browsertests gegen den gebauten Stand (Preview-Server muss laufen):
 ```bash
 npm run preview &
 npm run test:smoke      # Start, Prolog, Bewegung, Menü, Speichern, Laden
+npm run test:touch      # Joystick mit echten Touch-Ereignissen, Vollbild
 npm run test:areas      # betritt alle 36 Karten und prüft jede auf Fehler
+npm run test:combat     # Angriff, Schaden, Fähigkeit, Bildschirmtod
+npm run test:progress   # Rätsel → Boss → Belohnung
+npm test                # alle fünf nacheinander
 ```
+
+`test:touch` gibt es, weil der Rauchtest nur per Tastatur lief. Der Joystick —
+das einzige Steuerelement, das auf dem Zielgerät überhaupt existiert — war
+damit ungetestet, und genau dort steckte ein Fehler, der beim ersten Ziehen die
+komplette Oberfläche wegriss.
 
 `test:areas` nutzt Testhilfen, die nur mit `?test=1` in der URL existieren —
 ohne diesen Parameter gibt es sie nicht.

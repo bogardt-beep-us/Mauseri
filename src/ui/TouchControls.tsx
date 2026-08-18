@@ -63,18 +63,21 @@ export function TouchControls({ hud, selectedAbility, onSelectAbility, onUseAbil
     bus.emit('input:virtual', { x, y });
   }, []);
 
+  // Der Aufsetzpunkt liegt bewusst in einer Ref und nicht nur im State: die
+  // Bewegung muss noch im Ereignis selbst ausgerechnet werden koennen, und
+  // State ist dort noch der alte.
+  const basis = useRef<{ x: number; y: number } | null>(null);
+
   const onPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (pointerId.current !== null) return;
       pointerId.current = event.pointerId;
       event.currentTarget.setPointerCapture(event.pointerId);
       const rect = event.currentTarget.getBoundingClientRect();
-      setStick({
-        baseX: event.clientX - rect.left,
-        baseY: event.clientY - rect.top,
-        dx: 0,
-        dy: 0,
-      });
+      const baseX = event.clientX - rect.left;
+      const baseY = event.clientY - rect.top;
+      basis.current = { x: baseX, y: baseY };
+      setStick({ baseX, baseY, dx: 0, dy: 0 });
       setTouchUsed(true);
     },
     [],
@@ -83,30 +86,34 @@ export function TouchControls({ hud, selectedAbility, onSelectAbility, onUseAbil
   const onPointerMove = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (pointerId.current !== event.pointerId) return;
-      setStick((current) => {
-        if (!current) return current;
-        const rect = event.currentTarget.getBoundingClientRect();
-        let dx = event.clientX - rect.left - current.baseX;
-        let dy = event.clientY - rect.top - current.baseY;
+      const base = basis.current;
+      if (!base) return;
 
-        const length = Math.hypot(dx, dy);
-        if (length > JOYSTICK_RADIUS) {
-          dx = (dx / length) * JOYSTICK_RADIUS;
-          dy = (dy / length) * JOYSTICK_RADIUS;
-        }
+      // Alles, was am Ereignis haengt, wird hier gelesen - synchron, solange
+      // das Ereignis noch gueltig ist. Frueher stand diese Zeile in der
+      // Aktualisierungsfunktion von setStick, die React erst spaeter ausfuehrt;
+      // dann ist `currentTarget` bereits null und der Zugriff warf einen
+      // Fehler, der beim ersten Ziehen die ganze Oberflaeche wegriss.
+      const rect = event.currentTarget.getBoundingClientRect();
 
-        if (length < DEADZONE) {
-          sendVector(0, 0);
-        } else {
-          // Auf 0..1 normieren, damit leichtes Antippen langsam laeuft.
-          const strength = Math.min(1, length / JOYSTICK_RADIUS);
-          const nx = (dx / (length || 1)) * strength;
-          const ny = (dy / (length || 1)) * strength;
-          sendVector(nx, ny);
-        }
+      let dx = event.clientX - rect.left - base.x;
+      let dy = event.clientY - rect.top - base.y;
 
-        return { ...current, dx, dy };
-      });
+      const length = Math.hypot(dx, dy);
+      if (length > JOYSTICK_RADIUS) {
+        dx = (dx / length) * JOYSTICK_RADIUS;
+        dy = (dy / length) * JOYSTICK_RADIUS;
+      }
+
+      if (length < DEADZONE) {
+        sendVector(0, 0);
+      } else {
+        // Auf 0..1 normieren, damit leichtes Antippen langsam laeuft.
+        const strength = Math.min(1, length / JOYSTICK_RADIUS);
+        sendVector((dx / (length || 1)) * strength, (dy / (length || 1)) * strength);
+      }
+
+      setStick((current) => (current ? { ...current, dx, dy } : current));
     },
     [sendVector],
   );
@@ -115,6 +122,7 @@ export function TouchControls({ hud, selectedAbility, onSelectAbility, onUseAbil
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (pointerId.current !== event.pointerId) return;
       pointerId.current = null;
+      basis.current = null;
       setStick(null);
       sendVector(0, 0);
     },

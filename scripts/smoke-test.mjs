@@ -113,8 +113,9 @@ try {
 
   await page.screenshot({ path: `${SHOT_DIR}/04-bewegung.png` });
 
-  // 7. Menue oeffnen
-  await page.click('.icon-knopf');
+  // 7. Menue oeffnen. Bewusst ueber das Label und nicht ueber ".icon-knopf":
+  // daneben sitzt inzwischen der Vollbild-Knopf mit derselben Klasse.
+  await page.click('button[aria-label="Menue oeffnen"]');
   await page.waitForSelector('.menue', { timeout: 5000 });
   pruefe('Menue oeffnet sich', true);
   await page.screenshot({ path: `${SHOT_DIR}/05-menue.png` });

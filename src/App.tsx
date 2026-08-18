@@ -16,6 +16,7 @@ import type { AbilityId } from '@/data/types';
 import { AreaBanner, BossBar, Cinematics, Hud, Toasts } from './ui/Hud';
 import { Credits } from './ui/Credits';
 import { DialogueBox } from './ui/DialogueBox';
+import { ErrorBoundary } from './ui/ErrorBoundary';
 import { GameMenu, type MenuTab } from './ui/GameMenu';
 import { GameOver } from './ui/GameOver';
 import { TitleScreen } from './ui/TitleScreen';
@@ -181,13 +182,19 @@ export function App() {
         <AreaBanner />
         <Cinematics active={cutscene} />
 
-        <TouchControls
-          hud={hud}
-          selectedAbility={gewaehlteFaehigkeit}
-          onSelectAbility={faehigkeitWaehlen}
-          onUseAbility={faehigkeitEinsetzen}
-          visible={!dialog && !menue && !gameOver && !abspann && !cutscene}
-        />
+        {/* Eigene Fehlergrenze: geht in der Steuerung etwas kaputt, darf das
+            nicht HUD und Dialog mitreissen. Vorher loeschte ein Fehler im
+            Joystick die gesamte Oberflaeche - das Spiel lief weiter, war aber
+            nicht mehr bedienbar und sah aus wie abgestuerzt. */}
+        <ErrorBoundary bereich="Steuerung">
+          <TouchControls
+            hud={hud}
+            selectedAbility={gewaehlteFaehigkeit}
+            onSelectAbility={faehigkeitWaehlen}
+            onUseAbility={faehigkeitEinsetzen}
+            visible={!dialog && !menue && !gameOver && !abspann && !cutscene}
+          />
+        </ErrorBoundary>
 
         {dialog && <DialogueBox key={dialog.key} payload={dialog.payload} />}
 

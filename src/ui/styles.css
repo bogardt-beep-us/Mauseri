@@ -306,6 +306,48 @@ button {
 }
 
 /* ------------------------------------------------------------------------ */
+/* Fehlergrenze                                                              */
+/* ------------------------------------------------------------------------ */
+
+.fehler-grenze {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--safe-bottom) + 1.5rem);
+  transform: translateX(-50%);
+  width: min(92%, 26rem);
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--panel-rand);
+  border-radius: 14px;
+  background: rgba(28, 20, 48, 0.96);
+  pointer-events: auto;
+  text-align: center;
+}
+
+.fehler-titel {
+  margin: 0 0 0.3rem;
+  font-weight: 600;
+}
+
+.fehler-text {
+  margin: 0 0 0.9rem;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.fehler-knoepfe {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
+.fehler-knoepfe button {
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--panel-rand);
+  border-radius: 10px;
+  background: rgba(60, 44, 92, 0.9);
+}
+
+/* ------------------------------------------------------------------------ */
 /* Bossleiste                                                                */
 /* ------------------------------------------------------------------------ */
 

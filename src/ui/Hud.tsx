@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import type { BossBarPayload, HudSnapshot, ToastPayload } from '@/core/EventBus';
 import { useBusEvent } from './useBus';
+import { useFullscreen } from './useFullscreen';
 
 interface HudProps {
   hud: HudSnapshot;
@@ -15,6 +16,7 @@ interface HudProps {
 export function Hud({ hud, onOpenMenu }: HudProps) {
   const hpPct = hud.maxHp > 0 ? (hud.hp / hud.maxHp) * 100 : 0;
   const energyPct = hud.maxEnergy > 0 ? (hud.energy / hud.maxEnergy) * 100 : 0;
+  const vollbild = useFullscreen();
 
   return (
     <div className="hud">
@@ -36,6 +38,16 @@ export function Hud({ hud, onOpenMenu }: HudProps) {
           <span aria-hidden="true">◉</span>
           {hud.coins}
         </div>
+        {vollbild.unterstuetzt && (
+          <button
+            className="icon-knopf"
+            onClick={() => void vollbild.umschalten()}
+            aria-label={vollbild.aktiv ? 'Vollbild verlassen' : 'Vollbild'}
+            aria-pressed={vollbild.aktiv}
+          >
+            {vollbild.aktiv ? '⤢' : '⛶'}
+          </button>
+        )}
         <button className="icon-knopf" onClick={onOpenMenu} aria-label="Menue oeffnen">
           ☰
         </button>
