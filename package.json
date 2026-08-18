@@ -16,10 +16,11 @@
     "check": "npm run check:maps && npm run check:content && npm run check:logic && tsc --noEmit",
     "test:areas": "node --experimental-strip-types --import ./scripts/register-ts.mjs scripts/area-test.mjs",
     "test:combat": "node scripts/combat-test.mjs",
-    "test": "npm run test:smoke && npm run test:touch && npm run test:areas && npm run test:combat && npm run test:progress",
+    "test": "npm run test:smoke && npm run test:touch && npm run test:transition && npm run test:areas && npm run test:combat && npm run test:progress",
     "test:progress": "node scripts/progress-test.mjs",
     "check:logic": "node --experimental-strip-types --import ./scripts/register-ts.mjs scripts/check-logic.mjs",
-    "test:touch": "node scripts/touch-test.mjs"
+    "test:touch": "node scripts/touch-test.mjs",
+    "test:transition": "node scripts/transition-test.mjs"
   },
   "dependencies": {
     "phaser": "^3.90.0",

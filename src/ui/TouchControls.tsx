@@ -68,9 +68,50 @@ export function TouchControls({ hud, selectedAbility, onSelectAbility, onUseAbil
   // State ist dort noch der alte.
   const basis = useRef<{ x: number; y: number } | null>(null);
 
+  /** Beendet die laufende Beruehrung - egal, wie sie zu Ende gegangen ist. */
+  const loslassen = useCallback(() => {
+    pointerId.current = null;
+    basis.current = null;
+    setStick(null);
+    sendVector(0, 0);
+    // Sonst bliebe die Figur ewig im Block stehen, wenn der Knopf unter dem
+    // Finger verschwindet.
+    bus.emit('input:action', 'block-end');
+  }, [sendVector]);
+
+  // Sicherheitsnetz am Fenster. Der Joystick verschwindet beim Kartenwechsel
+  // kurz aus dem Baum (auf der neuen Karte laeuft oft ein Dialog, und dann ist
+  // die Steuerung ausgeblendet). Sein "pointerup" kam damit nie an, die
+  // gemerkte Zeiger-Nummer blieb stehen - und jede spaetere Beruehrung wurde
+  // als "da ist schon ein Finger" abgewiesen. Der Joystick war tot, bis man
+  // die Seite neu lud. Genau das faengt dieser Haken ab.
+  useEffect(() => {
+    const beiEnde = (event: PointerEvent) => {
+      if (pointerId.current === null || pointerId.current !== event.pointerId) return;
+      loslassen();
+    };
+    window.addEventListener('pointerup', beiEnde);
+    window.addEventListener('pointercancel', beiEnde);
+    return () => {
+      window.removeEventListener('pointerup', beiEnde);
+      window.removeEventListener('pointercancel', beiEnde);
+    };
+  }, [loslassen]);
+
+  // Wird die Steuerung ausgeblendet (Dialog, Menue, Cutscene, Kartenwechsel),
+  // gilt die Beruehrung als beendet. Der Finger liegt zwar noch auf dem Glas,
+  // aber das Element darunter gibt es nicht mehr.
+  const sichtbar = visible && touchUsed;
+  useEffect(() => {
+    if (sichtbar) return;
+    loslassen();
+  }, [sichtbar, loslassen]);
+
   const onPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
-      if (pointerId.current !== null) return;
+      // Kein vorzeitiges Abbrechen mehr, wenn schon eine Nummer gemerkt ist:
+      // die kann von einer Beruehrung stammen, deren Ende nie ankam. Ein
+      // neuer Finger uebernimmt einfach.
       pointerId.current = event.pointerId;
       event.currentTarget.setPointerCapture(event.pointerId);
       const rect = event.currentTarget.getBoundingClientRect();
@@ -121,19 +162,16 @@ export function TouchControls({ hud, selectedAbility, onSelectAbility, onUseAbil
   const onPointerUp = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (pointerId.current !== event.pointerId) return;
-      pointerId.current = null;
-      basis.current = null;
-      setStick(null);
-      sendVector(0, 0);
+      loslassen();
     },
-    [sendVector],
+    [loslassen],
   );
 
   const action = useCallback((name: 'attack' | 'interact' | 'dodge') => {
     bus.emit('input:action', name);
   }, []);
 
-  if (!visible || !touchUsed) {
+  if (!sichtbar) {
     return <div className="touch-controls versteckt" aria-hidden="true" />;
   }
 

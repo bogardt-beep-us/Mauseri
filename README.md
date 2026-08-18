@@ -219,11 +219,16 @@ Browsertests gegen den gebauten Stand (Preview-Server muss laufen):
 npm run preview &
 npm run test:smoke      # Start, Prolog, Bewegung, Menü, Speichern, Laden
 npm run test:touch      # Joystick mit echten Touch-Ereignissen, Vollbild
+npm run test:transition # Kartenwechsel mit gehaltenem Joystick
 npm run test:areas      # betritt alle 36 Karten und prüft jede auf Fehler
 npm run test:combat     # Angriff, Schaden, Fähigkeit, Bildschirmtod
 npm run test:progress   # Rätsel → Boss → Belohnung
-npm test                # alle fünf nacheinander
+npm test                # alle sechs nacheinander
 ```
+
+`test:transition` gibt es, weil Portale beim Betreten auslösen — der Finger
+liegt beim Kartenwechsel also zwangsläufig noch auf dem Joystick. Genau dort
+blieb die Steuerung hängen.
 
 `test:touch` gibt es, weil der Rauchtest nur per Tastatur lief. Der Joystick —
 das einzige Steuerelement, das auf dem Zielgerät überhaupt existiert — war

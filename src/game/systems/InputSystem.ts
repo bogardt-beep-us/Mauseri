@@ -125,9 +125,14 @@ export class InputSystem {
       this.state.moveY = 0;
       this.state.blocking = false;
       this.touchBlocking = false;
-      this.virtual.x = 0;
-      this.virtual.y = 0;
       this.pending.clear();
+      // `virtual` wird BEWUSST nicht zurueckgesetzt. Es beschreibt, wo der
+      // Daumen gerade liegt, und das bleibt waehrend der Sperre wahr - beim
+      // Kartenwechsel loest das Portal ja unter dem laufenden Finger aus.
+      // Ausgewertet wird es ohnehin nicht, solange gesperrt ist (siehe
+      // update()). Wurde es hier genullt, stand die Figur nach dem Wechsel
+      // still, obwohl der Finger noch zog: es kam kein neues Ereignis mehr,
+      // das den Wert haette wiederherstellen koennen.
     }
   }
 

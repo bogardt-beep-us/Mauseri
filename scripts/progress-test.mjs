@@ -142,7 +142,12 @@ try {
       let besiegt = false;
       let hpZuletzt = hpStart;
 
-      for (let runde = 0; runde < 260 && !besiegt; runde++) {
+      // Frist statt fester Rundenzahl: laeuft die Maschine unter Last (etwa
+      // weil die ganze Suite hintereinander lief), schaffte der Test die 260
+      // Runden zwar, aber nicht mehr in der Zeit, die der Kampf braucht - und
+      // meldete einen Fehler, den es nicht gab.
+      const frist = Date.now() + 90_000;
+      while (!besiegt && Date.now() < frist) {
         await page.evaluate(() => {
           const d = window.__mauseriDebug;
           d?.attack?.();
